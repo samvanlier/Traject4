@@ -7,6 +7,7 @@ namespace Traject4
     {
         private readonly Random _random;
 
+        public int Id { get; set; }
         public double[] m_X { get; set; }
         public double[] m_Y { get; set; }
         public double m_MinX { get; set; }
@@ -14,8 +15,9 @@ namespace Traject4
         public double m_MaxX { get; set; }
         public double m_MaxY { get; set; }
 
-        public Trajectory()
+        public Trajectory(int id)
         {
+            Id = id
             m_MinX = m_MinY = -Program.SpaceSize / 2;
             m_MaxX = m_MaxY = Program.SpaceSize / 2;
             _random = new Random();

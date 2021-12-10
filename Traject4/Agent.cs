@@ -7,6 +7,7 @@ namespace Traject4
     {
         private readonly Random _random;
         private readonly double _mixFactor = 0.5;
+        public int Id { get; set; }
 
         public int m_TrajNum { get; set; }
         public Trajectory[] m_T { get; set; }
@@ -14,11 +15,12 @@ namespace Traject4
         public Trajectory m_Backup { get; set; }
         public int m_ShiftIndex { get; set; }
 
-        public Agent(int trajNum)
+        public Agent(int trajNum, int id)
         {
+            this.Id = id;
             m_TrajNum = trajNum;
-            m_T = Enumerable.Repeat(new Trajectory(), trajNum).ToArray();
-            m_Success = Enumerable.Repeat((double)50.0, trajNum).ToArray();
+            m_T = Enumerable.Repeat(0, trajNum).Select(i => new Trajectory(i)).ToArray();
+            m_Success = Enumerable.Repeat(50.0, trajNum).ToArray();
 
             _random = new Random();
         }

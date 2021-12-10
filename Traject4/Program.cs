@@ -23,7 +23,11 @@ namespace Traject4
             // create agents
             var agents = new Agent[agentNum];
             for (int i = 0; i < agentNum; i++)
-                agents[i] = new Agent(trajNum);
+                agents[i] = new Agent(trajNum, i);
+
+            File.WriteAllText("./init.json", JsonConvert.SerializeObject(agents));
+            var sb = new StringBuilder();
+            sb.Append("run;avg\n")
 
             double runAvg = 0;
             for (int index = 0; index < maxIts; index++)
@@ -54,11 +58,38 @@ namespace Traject4
                 agents[shifter].AcceptReject(success);
 
                 if (index % 100 == 0)
+                {
                     Console.WriteLine($"index {index}: runAvg={runAvg}");
+                    sb.Append($"{index};{runAvg}\n")
+                }
+                    
             }
 
             Console.WriteLine("done");
 
+            File.WriteAllText("./out.json", JsonConvert.SerializeObject(agents));
+        }
+    }
+
+    class PrintAgent{
+        public int Id { get; set; }
+        public PrintTrajectory[] T { get; set; }
+
+        PrintAgent(Agent a){
+            this.Id = a.Id;
+            this.T = a.m_T.Select(t => new PrintAgent(t)).ToArray();
+        }
+    }
+
+    class PrintTrajectory {
+        public int Id { get; set; }
+        public double[] X { get; set; }
+        public double[] Y { get; set; }
+
+        PrintTrajectory(Trajectory t){
+            this.Id = t.Id;
+            this.X = t.m_X.ToArray();
+            this.Y = t.m_Y.ToArray();
         }
     }
 }
