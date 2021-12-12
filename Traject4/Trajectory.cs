@@ -17,7 +17,7 @@ namespace Traject4
 
         public Trajectory(int id)
         {
-            Id = id
+            Id = id;
             m_MinX = m_MinY = -Program.SpaceSize / 2;
             m_MaxX = m_MaxY = Program.SpaceSize / 2;
             _random = new Random();

@@ -1,12 +1,16 @@
 ﻿using System;
-using MathNet.Numerics.Distributions;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
 
 namespace Traject4
 {
     class Program
     {
         public readonly static int SpaceSize = 10;
-        public readonly static int TrajLength = 20;
+        //public readonly static int TrajLength = 20; //OG
+        public readonly static int TrajLength = 1; //OG
         public readonly static double NoiseLevel = 0.1; //todo find value in paper
 
         private readonly static int ShiftSD = 1; // Standard deviation of shift
@@ -17,7 +21,8 @@ namespace Traject4
 
             int agentNum = 10;
             int trajNum = 2; //todo find correct number in paper
-            int maxIts = 250000;
+            //int maxIts = 250000; //OG
+            int maxIts = 10;
             int testNum = 100;
 
             // create agents
@@ -25,9 +30,10 @@ namespace Traject4
             for (int i = 0; i < agentNum; i++)
                 agents[i] = new Agent(trajNum, i);
 
-            File.WriteAllText("./init.json", JsonConvert.SerializeObject(agents));
+            var init = JsonSerializer.Serialize(agents.Select(a => new PrintAgent(a)).ToArray());
+            File.WriteAllText("./init.json", init);
             var sb = new StringBuilder();
-            sb.Append("run;avg\n")
+            sb.Append("run;avg\n");
 
             double runAvg = 0;
             for (int index = 0; index < maxIts; index++)
@@ -60,33 +66,37 @@ namespace Traject4
                 if (index % 100 == 0)
                 {
                     Console.WriteLine($"index {index}: runAvg={runAvg}");
-                    sb.Append($"{index};{runAvg}\n")
+                    sb.Append($"{index};{runAvg}\n");
                 }
-                    
+
             }
 
             Console.WriteLine("done");
-
-            File.WriteAllText("./out.json", JsonConvert.SerializeObject(agents));
+            var outJson = JsonSerializer.Serialize(agents.Select(a => new PrintAgent(a)).ToArray());
+            File.WriteAllText("./out.json", outJson);
         }
     }
 
-    class PrintAgent{
+    public class PrintAgent
+    {
         public int Id { get; set; }
         public PrintTrajectory[] T { get; set; }
 
-        PrintAgent(Agent a){
+        public PrintAgent(Agent a)
+        {
             this.Id = a.Id;
-            this.T = a.m_T.Select(t => new PrintAgent(t)).ToArray();
+            this.T = a.m_T.Select(t => new PrintTrajectory(t)).ToArray();
         }
     }
 
-    class PrintTrajectory {
+    public class PrintTrajectory
+    {
         public int Id { get; set; }
         public double[] X { get; set; }
         public double[] Y { get; set; }
 
-        PrintTrajectory(Trajectory t){
+        public PrintTrajectory(Trajectory t)
+        {
             this.Id = t.Id;
             this.X = t.m_X.ToArray();
             this.Y = t.m_Y.ToArray();
