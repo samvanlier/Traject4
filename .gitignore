@@ -404,3 +404,4 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 Traject4/mono_crash.*.*.json
+.vscode/*

@@ -11,4 +11,7 @@
   <ItemGroup>
     <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Graph\Graph.csproj" />
+  </ItemGroup>
 </Project>

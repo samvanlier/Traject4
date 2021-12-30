@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.810.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Traject4", "Traject4\Traject4.csproj", "{1E9D35F3-226E-47AA-91C2-83CA1CDE0CF0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graph", "Graph\Graph.csproj", "{2F9D8225-B6EF-4C64-90B1-E64680AABDEF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "GraphTests\Tests.csproj", "{5352D232-2DB6-4EB9-8F1B-0938E66706B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{1E9D35F3-226E-47AA-91C2-83CA1CDE0CF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E9D35F3-226E-47AA-91C2-83CA1CDE0CF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E9D35F3-226E-47AA-91C2-83CA1CDE0CF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F9D8225-B6EF-4C64-90B1-E64680AABDEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F9D8225-B6EF-4C64-90B1-E64680AABDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F9D8225-B6EF-4C64-90B1-E64680AABDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F9D8225-B6EF-4C64-90B1-E64680AABDEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5352D232-2DB6-4EB9-8F1B-0938E66706B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5352D232-2DB6-4EB9-8F1B-0938E66706B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5352D232-2DB6-4EB9-8F1B-0938E66706B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5352D232-2DB6-4EB9-8F1B-0938E66706B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
