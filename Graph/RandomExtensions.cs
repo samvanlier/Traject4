@@ -27,7 +27,6 @@ namespace Graph
             if (p == null) // pick uniform random
                 return choices.ElementAt(rnd.Next(length));
 
-
             if (p.Count() != length)
                 throw new ArgumentException($"The length of choices and p have to be equal. choices.Count()={length}, p.Count()={p.Count()}");
 

@@ -66,9 +66,9 @@ namespace Traject4
 
         public bool Listen(Trajectory t)
         {
-            double bestDist = -1;
+            double bestDist = t.SimpleDist(m_T[0], -1.0);
             int best = 0;
-            for (int i = 0; i < m_TrajNum; i++)
+            for (int i = 1; i < m_TrajNum; i++)
             {
                 var item = m_T[i];
                 var dist = t.SimpleDist(item, bestDist);
@@ -91,7 +91,8 @@ namespace Traject4
 
             m_Backup = null; // clear backup
 
-            m_Success[m_ShiftIndex] = _mixFactor * success + (1 - _mixFactor) * m_Success[m_ShiftIndex];
+            m_Success[m_ShiftIndex] = _mixFactor * success + (1.0 - _mixFactor) * m_Success[m_ShiftIndex];
+            Console.WriteLine();
         }
     }
 }
