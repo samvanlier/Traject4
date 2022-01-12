@@ -6,6 +6,10 @@ namespace Traject4
     public class Trajectory : ICloneable
     {
         private readonly Random _random;
+        /// <summary>
+        /// In the paper refered as R
+        /// </summary>
+        private readonly int maxdist = 1;
 
         public int Id { get; set; }
         public double[] m_X { get; set; }
@@ -89,13 +93,38 @@ namespace Traject4
             }
         }
 
+        //TODO update noise function (see psuedo code) but only if results are weird
         internal void AddNoise2(double noise)
         {
+            // OG C++ code
+
+            //for (int i = 0; i < Program.TrajLength; i++)
+            //{
+            //    m_X[i] += NormRand(0, noise);
+            //    m_Y[i] += NormRand(0, noise);
+            //}
+
+            var sStart_X = NormRand(0, noise);
+            var sEnd_X = NormRand(0, noise);
+
+            var sStart_Y = NormRand(0, noise);
+            var sEnd_Y = NormRand(0, noise);
+
             for (int i = 0; i < Program.TrajLength; i++)
             {
-                m_X[i] += NormRand(0, noise);
-                m_Y[i] += NormRand(0, noise);
+                m_X[i] += AddNoise(sStart_X, sEnd_X, i, noise);
+                m_Y[i] += AddNoise(sStart_Y, sEnd_Y, i, noise);
             }
+        }
+
+        private double AddNoise(double sStart, double sEnd, int i, double noise)
+        {
+            var a = sStart * (Program.TrajLength - i) / (Program.TrajLength - 1);
+            var b = 0.0;
+            if (i - 1 > 0)
+                b = sEnd * (i - 1) / (Program.TrajLength - 1);
+
+            return a + b + NormRand(0, noise / Program.TrajLength);
         }
 
         internal void Shift(int amount)
@@ -108,22 +137,36 @@ namespace Traject4
 
             ReFit(pos); // make sure points stay inside the boundaries
 
-            // Shift points later on the trajectory
-            bool shifted = true;
-            for (int i = pos + 1; (i < Program.TrajLength) && shifted; i++)
+            ////Shift points later on the trajectory
+            //bool shifted = true;
+            //for (int i = pos + 1; (i < Program.TrajLength) && shifted; i++)
+            //{
+            //    var x = m_X[i - 1];
+            //    var y = m_Y[i - 1];
+            //    shifted = ShiftPoint(x, y, i);
+            //}
+
+            //// Shift points earlier on the trajectory
+            //shifted = true;
+            //for (int i = pos - 1; (i >= 0) && shifted; i--)
+            //{
+            //    var x = m_X[i + 1];
+            //    var y = m_Y[i + 1];
+            //    shifted = ShiftPoint(x, y, i);
+            //}
+
+            for (int j = pos; j < Program.TrajLength - 1; j++)
             {
-                var x = m_X[i - 1];
-                var y = m_Y[i - 1];
-                shifted = ShiftPoint(x, y, i);
+                var x = m_X[pos];
+                var y = m_Y[pos];
+                var shifted = ShiftPoint(x, y, j + 1);
             }
 
-            // Shift points earlier on the trajectory
-            shifted = true;
-            for (int i = pos - 1; (i >= 0) && shifted; i--)
+            for (int j = pos; j > 1; j--)
             {
-                var x = m_X[i + 1];
-                var y = m_Y[i + 1];
-                shifted = ShiftPoint(x, y, i);
+                var x = m_X[pos];
+                var y = m_Y[pos];
+                var shifted = ShiftPoint(x, y, j - 1);
             }
         }
 
@@ -133,9 +176,9 @@ namespace Traject4
             double difY = goalY - m_Y[position];
 
             double dist = difX * difX + difY * difY;
-            if (dist > 1)
+            if (dist > maxdist)
             {
-                dist = 1 / Math.Sqrt(dist);
+                dist = maxdist / Math.Sqrt(dist);
                 m_X[position] = goalX - difX * dist;
                 m_Y[position] = goalY - difY * dist;
                 return true;
