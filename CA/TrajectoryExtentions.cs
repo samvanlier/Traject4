@@ -68,6 +68,7 @@ namespace CA
 
             var points = trajectory.Points.Select(i => i  *1).ToArray();
 
+            // todo optimize array setting
             points[i] = points[i] + NormRandPoint(0, sigmaShift);
 
             points[i] = ReFit(points[i]);
