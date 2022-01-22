@@ -97,7 +97,9 @@ namespace CA
         public static Trajectory Shift3(this Trajectory trajectory, double sigmaShift)
         {
             //todo optimize?
-            var nd = new Normal(0, sigmaShift);
+            //var nd = new Normal(0, sigmaShift);
+            var nd = Program.ShiftNormal;
+            var maxDist = Program.MAX_DIST * Program.MAX_DIST;
 
             var xs = trajectory.Points.Select(p => p.X).ToArray();
             var ys = trajectory.Points.Select(p => p.Y).ToArray();
@@ -109,15 +111,16 @@ namespace CA
 
             for (int j = pos; j < Program.TRAJECTORY_LENGTH - 1; j++)
             {
-                var dist = Math.Sqrt((xs[j] - xs[j+1]) * (xs[j] - xs[j+1]) + (ys[j] - ys[j+1])*(ys[j] - ys[j+1]));
+                var dist = (xs[j] - xs[j+1]) * (xs[j] - xs[j+1]) + (ys[j] - ys[j+1])*(ys[j] - ys[j+1]);
 
                 //todo optimze
                 // sqrt(a) > dist <=> a > dist*dist
                 // note: dist > 0
-                if (dist > Program.MAX_DIST)
+                if (dist > maxDist)
                 {
-                    xs[j+1] = (Program.MAX_DIST / (dist)) * (xs[j+1]-xs[j]);
-                    ys[j+1] = (Program.MAX_DIST / (dist)) * (ys[j+1]-ys[j]);
+                    dist = Math.Sqrt(dist);
+                    xs[j+1] = (Program.MAX_DIST / dist) * (xs[j+1]-xs[j]);
+                    ys[j+1] = (Program.MAX_DIST / dist) * (ys[j+1]-ys[j]);
                 }
                 //else
                 //{
@@ -128,11 +131,16 @@ namespace CA
 
             for (int j = pos; j > 0; j--)
             {
-                var dist = Math.Sqrt((xs[j] - xs[j-1]) * (xs[j] - xs[j-1]) + (ys[j] - ys[j-1])*(ys[j] - ys[j-1]));
-                if (dist > Program.MAX_DIST)
+                var dist = (xs[j] - xs[j-1]) * (xs[j] - xs[j-1]) + (ys[j] - ys[j-1])*(ys[j] - ys[j-1]);
+
+                //todo optimze
+                // sqrt(a) > dist <=> a > dist*dist
+                // note: dist > 0
+                if (dist > maxDist)
                 {
-                    xs[j-1]  = (Program.MAX_DIST / (dist)) * (xs[j-1]-xs[j]);
-                    ys[j-1]  = (Program.MAX_DIST / (dist)) * (ys[j-1]-ys[j]);
+                    dist = Math.Sqrt(dist);
+                    xs[j-1] = (Program.MAX_DIST / (dist)) * (xs[j-1]-xs[j]);
+                    ys[j-1] = (Program.MAX_DIST / (dist)) * (ys[j-1]-ys[j]);
                 }
             }
 
@@ -192,7 +200,6 @@ namespace CA
         public static Trajectory Mix(this Trajectory t1, Trajectory t2, double beta)
             => new Trajectory()
             {
-                // todo test mixing
                 Points = t1.Points.Zip(t2.Points, (a, b) => (beta * a) + (1 - beta) * b).ToArray(),
                 Success = t1.Success
             };
@@ -259,8 +266,20 @@ namespace CA
         /// <returns></returns>
         public static Trajectory AddNoise2(this Trajectory tPure, double sigmaNoise)
         {
+            //var points = tPure.Points
+            //    .Select(p => p + NormRandPoint(0, sigmaNoise)).ToArray();
+
+            var nb = Program.NoiseNormal;
+
             var points = tPure.Points
-                .Select(p => p + NormRandPoint(0, sigmaNoise)).ToArray();
+                .Select(p =>
+                {
+                    var x = nb.Sample();
+                    var y = nb.Sample();
+
+                    return p + new TrajectoryPoint(x, y);
+                })
+                .ToArray();
 
             return new Trajectory()
             {

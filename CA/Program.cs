@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using MathNet.Numerics.Distributions;
 using ScottPlot;
 
 namespace CA
@@ -64,8 +65,12 @@ namespace CA
         private static int maxIts = 60000; // value paper
         //private static int maxIts = 250000; // value C++ code
 
+        public static Normal ShiftNormal { get; private set; }
+        public static Normal NoiseNormal { get; private set; }
+
         static void Main(string[] args)
         {
+            SetNormals();
             Console.WriteLine("Start simulation");
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -243,6 +248,12 @@ namespace CA
             var tSucc = initiator.FindClosest(tResp);
 
             return tSucc.Equals(tInit);
+        }
+
+        private static void SetNormals()
+        {
+            ShiftNormal = new Normal(0, SIGMA_SHIFT);
+            NoiseNormal = new Normal(0, SIGMA_NOISE);
         }
     }
 
