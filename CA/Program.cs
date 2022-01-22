@@ -134,7 +134,23 @@ namespace CA
 
                 #region C++ codebase
 
-                Parallel.For(0, agentNum, indey =>
+                //Parallel.For(0, agentNum, indey =>
+                //{
+                //    if (indey != initatorIndex)
+                //    {
+                //        var imitator = agents.ElementAt(indey);
+
+                //        for (int j = 0; j < N_TEST; j++)
+                //        {
+                //            Debug.WriteLine($"[{DateTime.Now} iter {i}]" +
+                //                $"\t" +
+                //                $"PlayGame({initiator.Id}, {tOriginalIndex}, {imitator.Id})");
+                //            if (PlayGame(initiator, tShifted, imitator))
+                //                Interlocked.Increment(ref success);
+                //        }
+                //    }
+                //});
+                for (int indey = 0; indey < agentNum; indey++)
                 {
                     if (indey != initatorIndex)
                     {
@@ -149,7 +165,7 @@ namespace CA
                                 Interlocked.Increment(ref success);
                         }
                     }
-                });
+                }
 
                 #endregion
 
