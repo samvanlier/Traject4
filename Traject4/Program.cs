@@ -21,9 +21,17 @@ namespace Traject4
         public readonly static int testNum = 100; // play the game testNum of times for the speaker
 
         private readonly static int ShiftSD = 1; // Standard deviation of shift
+
+
         #region Main program
+
         static void Main(string[] args)
         {
+
+            // target folder
+            var folder = @"/Users/sam/Google Drive/evo_of_speech/";
+
+
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             var random = new Random(); // TODO remove seed
@@ -33,7 +41,7 @@ namespace Traject4
 
             // number of games
             //int maxIts = 60000; // value paper
-            int maxIts = 100;
+            int maxIts = 1000000;
 
             // create agents
             var agents = new Agent[agentNum];
@@ -41,7 +49,7 @@ namespace Traject4
                 agents[i] = new Agent(trajNum, i);
 
             var init = JsonSerializer.Serialize(agents.Select(a => new PrintAgent(a)).ToArray());
-            File.WriteAllText("./init.json", init);
+            File.WriteAllText($"{folder}init.json", init);
             var sb = new StringBuilder();
             sb.Append("run;avg\n");
 
@@ -110,7 +118,7 @@ namespace Traject4
             File.WriteAllText("./out.csv", r);
 
             var outJson = JsonSerializer.Serialize(agents.Select(a => new PrintAgent(a)).ToArray());
-            File.WriteAllText("./out.json", outJson);
+            File.WriteAllText($"{folder}out.json", outJson);
             Console.WriteLine("done running");
 
             TimeSpan t = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);

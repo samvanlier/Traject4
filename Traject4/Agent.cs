@@ -45,7 +45,8 @@ namespace Traject4
 
         public Trajectory Say()
         {
-            var m_NoiseT = (Trajectory)m_T[m_ShiftIndex].Clone();
+            var toSay = m_T[m_ShiftIndex];
+            var m_NoiseT = (Trajectory)toSay.Clone();
 
             // Addnoise must be commented out if noise is added in distance calculation.
             //	m_NoiseT.AddNoise( NoiseLevel);

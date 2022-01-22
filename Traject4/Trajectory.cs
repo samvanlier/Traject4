@@ -39,8 +39,10 @@ namespace Traject4
             double yscale = m_MaxY - m_MinY;
 
             // note: randomization only takes place in the middle
-            m_X[0] = xscale * (0.1 * _random.NextDouble() + 0.45) + m_MinX;
-            m_Y[0] = yscale * (0.1 * _random.NextDouble() + 0.45) + m_MinY;
+            var x = xscale * (0.1 * _random.NextDouble() + 0.45) + m_MinX;
+            var y = yscale * (0.1 * _random.NextDouble() + 0.45) + m_MinY;
+            m_X[0] = x;
+            m_Y[0] = y;
 
             // except if one uses the below statements:
             //m_X[0] = xscale * _random.NextDouble() + m_MinX;
@@ -56,6 +58,7 @@ namespace Traject4
                 }
                 while (NoFit(m_X[i + 1], m_Y[i + 1]));
             }
+            var a = 0;
         }
 
         internal double SimpleDist(Trajectory t, double best)
