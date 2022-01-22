@@ -11,6 +11,15 @@ namespace CA
         public ICollection<TrajectoryPoint> Points { get; set; }
         public double Success { get; set; }
 
+        public static double Min
+        {
+            get => -(double)Program.SPACE_SIZE/2.0;
+        }
+        public static double Max
+        {
+            get => (double)Program.SPACE_SIZE/2.0;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -23,6 +32,27 @@ namespace CA
                 .Select(p => p.Norm()).Sum();
 
             return dist;
+        }
+
+        internal double SimpleDist(Trajectory t, double best)
+        {
+            double totD = Points.ElementAt(0).Dist(t.Points.ElementAt(0));
+
+            if (best == -1)
+            {
+                for (int i = 1; i < Program.TRAJECTORY_LENGTH; i++)
+                {
+                    totD += Points.ElementAt(i).Dist(t.Points.ElementAt(i));  
+                }
+            } else
+            {
+                for (int i = 1; (i< Program.TRAJECTORY_LENGTH) && (totD < best); i++)
+                {
+                    totD += Points.ElementAt(i).Dist(t.Points.ElementAt(i));
+                }
+            }
+
+            return totD;
         }
 
         public override bool Equals(object obj)
@@ -45,10 +75,11 @@ namespace CA
             => new Trajectory()
             {
                 Success = this.Success,
-                Points = this.Points.Select(t => t.Clone()).ToArray()
+                Points = this.Points.Select(t => t * 1.0).ToArray()
             };
 
-        internal void Randomize()
+        //todo add random to function parameters
+        public void Randomize()
         {
             var points = new TrajectoryPoint[Program.TRAJECTORY_LENGTH];
 

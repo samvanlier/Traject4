@@ -1,15 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.810.14
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graph", "Graph\Graph.csproj", "{2F9D8225-B6EF-4C64-90B1-E64680AABDEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Graph", "Graph\Graph.csproj", "{2F9D8225-B6EF-4C64-90B1-E64680AABDEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "GraphTests\Tests.csproj", "{5352D232-2DB6-4EB9-8F1B-0938E66706B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "GraphTests\Tests.csproj", "{5352D232-2DB6-4EB9-8F1B-0938E66706B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Traject4", "Traject4\Traject4.csproj", "{D9F28B90-A253-4258-84A3-D35ADD234A1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Traject4", "Traject4\Traject4.csproj", "{D9F28B90-A253-4258-84A3-D35ADD234A1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA", "CA\CA.csproj", "{9288E8F0-D91F-4B9E-AE43-629FCC8DAD3E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CA", "CA\CA.csproj", "{9288E8F0-D91F-4B9E-AE43-629FCC8DAD3E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA2", "CA2\CA2.csproj", "{62D77A84-CFE4-428E-955B-546AA239DC98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{9288E8F0-D91F-4B9E-AE43-629FCC8DAD3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9288E8F0-D91F-4B9E-AE43-629FCC8DAD3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9288E8F0-D91F-4B9E-AE43-629FCC8DAD3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62D77A84-CFE4-428E-955B-546AA239DC98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62D77A84-CFE4-428E-955B-546AA239DC98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62D77A84-CFE4-428E-955B-546AA239DC98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62D77A84-CFE4-428E-955B-546AA239DC98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

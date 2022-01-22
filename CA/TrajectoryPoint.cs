@@ -5,8 +5,8 @@ namespace CA
 {
     public readonly struct TrajectoryPoint : IEquatable<TrajectoryPoint>
     {
-        internal readonly double X;
-        internal readonly double Y;
+        public readonly double X;
+        public readonly double Y;
 
         public TrajectoryPoint(double x, double y)
         {
@@ -37,6 +37,15 @@ namespace CA
         public static TrajectoryPoint operator /(TrajectoryPoint a, double val) => a * (1 / val);
         public static TrajectoryPoint operator /(double val, TrajectoryPoint a) => a / val;
 
+
+        public double Dist(TrajectoryPoint other)
+        {
+            return Math.Sqrt(
+                ((this.X - other.X) * (this.X - other.X))
+                +
+                ((this.Y - other.Y) * (this.Y - other.Y))
+                );
+        }
 
         public double Norm()
         {

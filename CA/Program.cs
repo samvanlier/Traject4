@@ -11,7 +11,7 @@ using ScottPlot;
 
 namespace CA
 {
-    class Program
+    public class Program
     {
         /// <summary>
         /// 
@@ -50,14 +50,17 @@ namespace CA
         /// </summary>
         public static readonly double BETA = 0.5; // mix factor
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public readonly static int TRAJ_NUM = 4; // value paper
 
         /// <summary>
         /// 
         /// </summary>
-        public readonly static Random RANDOM = new Random();
+        public readonly static Random RANDOM = new Random(1);
 
         private static int agentNum = 10; // value paper
-        private static int trajNum = 4; // value paper
         private static int maxIts = 60000; // value paper
         //private static int maxIts = 250000; // value C++ code
 
@@ -68,8 +71,10 @@ namespace CA
 
             var folder = @"/Users/sam/Google Drive/evo_of_speech/";
 
-
+            Console.WriteLine("Create agents");
             var agents = Enumerable.Range(0, agentNum)
+                .AsParallel()
+                .AsOrdered()
                 .Select(i =>
                 {
                     var a = new Agent()
@@ -77,7 +82,7 @@ namespace CA
                         Id = i
                     };
 
-                    a.Trajectories = Enumerable.Range(0, trajNum)
+                    a.Trajectories = Enumerable.Range(0, TRAJ_NUM)
                         .Select(_ =>
                         {
                             var t = new Trajectory()
@@ -92,10 +97,11 @@ namespace CA
                         .ToArray();
 
                     return a;
-                }).ToList();
+                })
+                .ToList();
 
             var init = JsonSerializer.Serialize(agents.Select(a => new PrintAgent(a)).ToArray());
-            File.WriteAllText($"{folder}init.json", init);
+            File.WriteAllText($"./init.json", init);
             var sb = new StringBuilder();
             sb.Append("run;avg\n");
 
@@ -104,18 +110,20 @@ namespace CA
             double[] runner = new double[maxIts];
             int replaced = 0;
 
+            Console.WriteLine($"start running for {maxIts} iterations");
+
             for (int i = 0; i < maxIts; i++)
             {
                 var initatorIndex = RANDOM.Next(agentNum);
                 var initiator = agents.ElementAt(initatorIndex);
 
-                var tOriginalIndex = RANDOM.Next(trajNum);
+                var tOriginalIndex = RANDOM.Next(TRAJ_NUM);
                 var tOriginal = initiator.Trajectories.ElementAt(tOriginalIndex).Clone();
 
-                var tShifted = tOriginal.Shift(SIGMA_SHIFT);
-                tShifted.Success = 0;
+                //var tShifted = tOriginal.Shift2(SIGMA_SHIFT);
+                var tShifted = tOriginal.Shift3(SIGMA_SHIFT); //TODO check shift
+                tShifted.Success = 0.0;
                 initiator.Replace(tOriginalIndex, tShifted);
-
 
                 int success = 0;
 
@@ -129,6 +137,9 @@ namespace CA
 
                         for (int j = 0; j < N_TEST; j++)
                         {
+                            Debug.WriteLine($"[{DateTime.Now} iter {i}]" +
+                                $"\t" +
+                                $"PlayGame({initiator.Id}, {tOriginalIndex}, {imitator.Id})");
                             if (PlayGame(initiator, tShifted, imitator))
                                 Interlocked.Increment(ref success);
                         }
@@ -159,7 +170,7 @@ namespace CA
                     initiator.Replace(tOriginalIndex, tOriginal);
                 else
                 {
-                    var tNew = tOriginal.Mix2(tShifted, BETA);
+                    var tNew = tOriginal.Mix(tShifted, BETA);
                     double og = BETA * tOriginal.Success;
                     double sr = (double)success / (N_TEST * (agentNum - 1));
                     double b = sr * (1.0 - BETA);
@@ -195,7 +206,7 @@ namespace CA
                                     t.Minutes,
                                     t.Seconds,
                                     t.Milliseconds);
-            Console.WriteLine($"run time: {elapsedTime}ms");
+            Console.WriteLine($"run time: {elapsedTime}");
             Console.WriteLine("All finnished");
 
             Console.WriteLine($"The number of replacemants was {replaced}");
@@ -204,7 +215,7 @@ namespace CA
             File.WriteAllText("./out.csv", r);
 
             var outJson = JsonSerializer.Serialize(agents.Select(a => new PrintAgent(a)).ToArray());
-            File.WriteAllText($"{folder}out.json", outJson);
+            File.WriteAllText($"./out.json", outJson);
 
             Console.WriteLine("plot chart:");
 
@@ -223,9 +234,12 @@ namespace CA
 
         public static bool PlayGame(Agent initiator, Trajectory tInit, Agent imitator)
         {
+            // todo optimize with index instead of Trajectories
+
             var tSaid = tInit.AddNoise2(SIGMA_NOISE);
             var tImit = imitator.FindClosest(tSaid);
-            var tResp = tImit.AddNoise2(SIGMA_NOISE);
+            //var tResp = tImit.AddNoise2(SIGMA_NOISE); // no noise added in C++ version
+            var tResp = tImit;
             var tSucc = initiator.FindClosest(tResp);
 
             return tSucc.Equals(tInit);

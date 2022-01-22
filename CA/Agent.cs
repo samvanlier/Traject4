@@ -10,9 +10,9 @@ namespace CA
         public int Id { get; set; }
         public ICollection<Trajectory> Trajectories { get; set; }
 
-
         public void Replace(int originalIndex, Trajectory trajectory)
         {
+            //todo optimize?
             var array = Trajectories.ToArray();
             array[originalIndex] = trajectory.Clone();
 
