@@ -1,5 +1,5 @@
 ﻿using System;
-namespace CA2
+namespace Traject4
 {
     public class Trajectory
     {
@@ -18,7 +18,7 @@ namespace CA2
             X[0] = scale * (0.1 * Program.RANDOM.NextDouble() + 0.45) + Min;
             Y[0] = scale * (0.1 * Program.RANDOM.NextDouble() + 0.45) + Min;
 
-            for (int i = 0; i < Program.TRAJECTORY_LENGTH -1; i++)
+            for (int i = 0; i < Program.TRAJECTORY_LENGTH - 1; i++)
             {
                 do
                 {
@@ -51,14 +51,14 @@ namespace CA2
             ReFit(pos);
 
             bool shifted = true;
-            for (int i = pos+1; (i < Program.TRAJECTORY_LENGTH) && shifted; i++)
+            for (int i = pos + 1; (i < Program.TRAJECTORY_LENGTH) && shifted; i++)
             {
-                shifted = ShiftPoint(X[i-1], Y[i-1], i);
+                shifted = ShiftPoint(X[i - 1], Y[i - 1], i);
             }
 
 
             shifted = true;
-            for (int i = pos-1; (i >= 0) && shifted; i--)
+            for (int i = pos - 1; (i >= 0) && shifted; i--)
             {
                 shifted = ShiftPoint(X[i + 1], Y[i + 1], i);
             }
@@ -84,7 +84,7 @@ namespace CA2
 
         private static double Dist(double x1, double y1, double x2, double y2)
             => Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-        
+
 
         /// <summary>
         /// Is <c>AddNoise2</c> in the C++ version
@@ -105,9 +105,9 @@ namespace CA2
             double dify = y - Y[indexToSet];
 
             var dist = (difx * difx) + (dify * dify);
-            if (dist > Program.MAX_DIST) // dist > 1^2
+            if (dist >= Program.MAX_DIST * Program.MAX_DIST) // dist > 1^2
             {
-                dist = 1 / Math.Sqrt(dist);
+                dist = Program.MAX_DIST / Math.Sqrt(dist);
                 X[indexToSet] = x - difx * dist;
                 Y[indexToSet] = y - dify * dist;
                 return true;
@@ -116,12 +116,12 @@ namespace CA2
             return false;
         }
 
-        internal void Mix(Trajectory old, double beta)
+        public void Mix(Trajectory old, double beta)
         {
             for (int i = 0; i < Program.TRAJECTORY_LENGTH; i++)
             {
                 X[i] = beta * X[i] + (1.0 - beta) * old.X[i];
-                Y[i] = beta * X[i] + (1.0 - beta) * old.Y[i];
+                Y[i] = beta * Y[i] + (1.0 - beta) * old.Y[i];
             }
         }
 

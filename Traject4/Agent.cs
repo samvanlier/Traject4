@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace CA2
+namespace Traject4
 {
     public class Agent
     {
@@ -13,8 +13,8 @@ namespace CA2
 
         private BackUp backup;
         private Trajectory Noisy;
-        
-        internal void Initialise(int trajNum)
+
+        public void Initialise(int trajNum)
         {
             TrajNum = trajNum;
 
@@ -34,7 +34,7 @@ namespace CA2
             public double[] Y { get; set; }
         }
 
-        internal void PrepareShift(double sigmaShift)
+        public void PrepareShift(double sigmaShift)
         {
             ShiftIndex = Program.RANDOM.Next(Program.TRAJ_NUM);
 
@@ -49,7 +49,7 @@ namespace CA2
             trajectToShift.Shift(sigmaShift);
         }
 
-        internal Trajectory Say()
+        public Trajectory Say()
         {
             var toSay = Trajectories[ShiftIndex];
 
@@ -64,13 +64,13 @@ namespace CA2
             return Noisy;
         }
 
-        internal Trajectory Imitate(Trajectory tSaid)
+        public Trajectory Imitate(Trajectory tSaid)
         {
             double bestDist = tSaid.SimpleDist(Trajectories[0], -1);
 
             int bestT = 0;
 
-            for(int i = 1; i < Program.TRAJ_NUM; i++)
+            for (int i = 1; i < Program.TRAJ_NUM; i++)
             {
                 var dist = tSaid.SimpleDist(Trajectories[i], bestDist);
                 if (dist < bestDist)
@@ -83,7 +83,7 @@ namespace CA2
             return Trajectories[bestT];
         }
 
-        internal bool Listen(Trajectory tImit)
+        public bool Listen(Trajectory tImit)
         {
             double bestDist = tImit.SimpleDist(Trajectories[0], -1);
 

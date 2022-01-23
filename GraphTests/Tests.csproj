@@ -16,5 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CA\CA.csproj" />
     <ProjectReference Include="..\Graph\Graph.csproj" />
+    <ProjectReference Include="..\Friends\Friends.csproj" />
+    <ProjectReference Include="..\Traject4\Traject4.csproj" />
   </ItemGroup>
 </Project>
