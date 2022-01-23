@@ -126,7 +126,7 @@ namespace CA
                 var tOriginal = initiator.Trajectories.ElementAt(tOriginalIndex).Clone();
 
                 //var tShifted = tOriginal.Shift2(SIGMA_SHIFT);
-                var tShifted = tOriginal.Shift3(SIGMA_SHIFT); //TODO check shift
+                var tShifted = tOriginal.Shift2(SIGMA_SHIFT); //TODO check shift
                 tShifted.Success = 0.0;
                 initiator.Replace(tOriginalIndex, tShifted);
 
@@ -150,6 +150,7 @@ namespace CA
                 //        }
                 //    }
                 //});
+
                 for (int indey = 0; indey < agentNum; indey++)
                 {
                     if (indey != initatorIndex)
@@ -161,7 +162,10 @@ namespace CA
                             Debug.WriteLine($"[{DateTime.Now} iter {i}]" +
                                 $"\t" +
                                 $"PlayGame({initiator.Id}, {tOriginalIndex}, {imitator.Id})");
-                            if (PlayGame(initiator, tShifted, imitator))
+                            //if (PlayGame(initiator, tShifted, imitator))
+                            //    Interlocked.Increment(ref success);
+
+                            if (PlayGame(initiator, tShifted, tOriginalIndex, imitator))
                                 Interlocked.Increment(ref success);
                         }
                     }
@@ -264,6 +268,17 @@ namespace CA
             var tSucc = initiator.FindClosest(tResp);
 
             return tSucc.Equals(tInit);
+        }
+
+        public static bool PlayGame(Agent initiator, Trajectory tInit, int initIndex, Agent imitator)
+        {
+            var tSaid = tInit.AddNoise2(SIGMA_NOISE);
+            int tImit = imitator.FindClosestIndex(tSaid);
+            //var tResp = tImit.AddNoise2(SIGMA_NOISE); // no noise added in C++ version
+            var tResp = imitator.Trajectories.ElementAt(tImit);
+            int tSucc = initiator.FindClosestIndex(tResp);
+
+            return initIndex == tSucc;
         }
 
         private static void SetNormals()

@@ -209,7 +209,7 @@ namespace CA
         {
             var points = new List<TrajectoryPoint>();
 
-            for (int i = 0; i < oldT.Points.Count; i++)
+            for (int i = 0; i < oldT.Points.Length; i++)
             {
                 var o = oldT.Points.ElementAt(i);
                 var n = newT.Points.ElementAt(i);

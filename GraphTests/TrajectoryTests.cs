@@ -39,7 +39,7 @@ namespace Tests
             _trajectoryB.Randomize();
         }
 
-        private ICollection<Trajectory> CreateTrajectories()
+        private Trajectory[] CreateTrajectories()
         {
            return  Enumerable.Range(0, 4)
                         .Select(_ =>
@@ -90,12 +90,12 @@ namespace Tests
             var res = _agentA.FindClosest(rT);
             var res2 = _agentA.FindClosest2(rT);
 
-            for (int i = 0; i < res.Points.Count; i++)
+            for (int i = 0; i < res.Points.Length; i++)
             {
                 Assert.AreEqual(rT.Points.ElementAt(i), res.Points.ElementAt(i));
             }
 
-            for (int i = 0; i < res.Points.Count; i++)
+            for (int i = 0; i < res.Points.Length; i++)
             {
                 Assert.AreEqual(rT.Points.ElementAt(i), res2.Points.ElementAt(i));
             }
@@ -111,7 +111,7 @@ namespace Tests
             var res = _agentB.FindClosest(rT);
             var res2 = _agentB.FindClosest2(rT);
 
-            for (int i = 0; i < res.Points.Count; i++)
+            for (int i = 0; i < res.Points.Length; i++)
             {
                 Assert.AreEqual(res2.Points.ElementAt(i), res.Points.ElementAt(i));
             }
@@ -133,7 +133,7 @@ namespace Tests
             var res2 = _trajectoryA.Shift2(sigmaShift).Points; // c++ versie
             var res3 = _trajectoryA.Shift3(sigmaShift).Points;  // psuedo code versie
 
-            for (int i = 0; i < points.Count; i++)
+            for (int i = 0; i < points.Length; i++)
             {
                 var point = points.ElementAt(i);
                 var res1po = res1.ElementAt(i);
@@ -185,7 +185,7 @@ namespace Tests
             var res3 = _trajectoryA.AddNoise3(sigmaNoise).Points;
             var res4 = _trajectoryA.AddNoise4(sigmaNoise).Points;
 
-            for (int i = 0; i < points.Count; i++)
+            for (int i = 0; i < points.Length; i++)
             {
                 var point = points.ElementAt(i);
                 var res1po = res1.ElementAt(i);
@@ -217,7 +217,7 @@ namespace Tests
             Assert.AreNotEqual(points, res1);
             Assert.AreNotEqual(points, res2);
 
-            for (int i = 0; i < points.Count; i++)
+            for (int i = 0; i < points.Length; i++)
             {
                 var point = points.ElementAt(i);
                 var res1po = res1.ElementAt(i);
