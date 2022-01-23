@@ -8,7 +8,7 @@ namespace CA
 
     public class Trajectory
     {
-        public ICollection<TrajectoryPoint> Points { get; set; }
+        public TrajectoryPoint[] Points { get; set; }
         public double Success { get; set; }
 
         public static double Min

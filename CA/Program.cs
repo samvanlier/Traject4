@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using MathNet.Numerics.Distributions;
 using ScottPlot;
 
 namespace CA
@@ -64,8 +65,12 @@ namespace CA
         private static int maxIts = 60000; // value paper
         //private static int maxIts = 250000; // value C++ code
 
+        public static Normal ShiftNormal { get; private set; }
+        public static Normal NoiseNormal { get; private set; }
+
         static void Main(string[] args)
         {
+            SetNormals();
             Console.WriteLine("Start simulation");
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -121,7 +126,7 @@ namespace CA
                 var tOriginal = initiator.Trajectories.ElementAt(tOriginalIndex).Clone();
 
                 //var tShifted = tOriginal.Shift2(SIGMA_SHIFT);
-                var tShifted = tOriginal.Shift3(SIGMA_SHIFT); //TODO check shift
+                var tShifted = tOriginal.Shift2(SIGMA_SHIFT); //TODO check shift
                 tShifted.Success = 0.0;
                 initiator.Replace(tOriginalIndex, tShifted);
 
@@ -129,7 +134,24 @@ namespace CA
 
                 #region C++ codebase
 
-                Parallel.For(0, agentNum, indey =>
+                //Parallel.For(0, agentNum, indey =>
+                //{
+                //    if (indey != initatorIndex)
+                //    {
+                //        var imitator = agents.ElementAt(indey);
+
+                //        for (int j = 0; j < N_TEST; j++)
+                //        {
+                //            Debug.WriteLine($"[{DateTime.Now} iter {i}]" +
+                //                $"\t" +
+                //                $"PlayGame({initiator.Id}, {tOriginalIndex}, {imitator.Id})");
+                //            if (PlayGame(initiator, tShifted, imitator))
+                //                Interlocked.Increment(ref success);
+                //        }
+                //    }
+                //});
+
+                for (int indey = 0; indey < agentNum; indey++)
                 {
                     if (indey != initatorIndex)
                     {
@@ -140,11 +162,14 @@ namespace CA
                             Debug.WriteLine($"[{DateTime.Now} iter {i}]" +
                                 $"\t" +
                                 $"PlayGame({initiator.Id}, {tOriginalIndex}, {imitator.Id})");
-                            if (PlayGame(initiator, tShifted, imitator))
+                            //if (PlayGame(initiator, tShifted, imitator))
+                            //    Interlocked.Increment(ref success);
+
+                            if (PlayGame(initiator, tShifted, tOriginalIndex, imitator))
                                 Interlocked.Increment(ref success);
                         }
                     }
-                });
+                }
 
                 #endregion
 
@@ -243,6 +268,23 @@ namespace CA
             var tSucc = initiator.FindClosest(tResp);
 
             return tSucc.Equals(tInit);
+        }
+
+        public static bool PlayGame(Agent initiator, Trajectory tInit, int initIndex, Agent imitator)
+        {
+            var tSaid = tInit.AddNoise2(SIGMA_NOISE);
+            int tImit = imitator.FindClosestIndex(tSaid);
+            //var tResp = tImit.AddNoise2(SIGMA_NOISE); // no noise added in C++ version
+            var tResp = imitator.Trajectories.ElementAt(tImit);
+            int tSucc = initiator.FindClosestIndex(tResp);
+
+            return initIndex == tSucc;
+        }
+
+        private static void SetNormals()
+        {
+            ShiftNormal = new Normal(0, SIGMA_SHIFT);
+            NoiseNormal = new Normal(0, SIGMA_NOISE);
         }
     }
 
