@@ -61,7 +61,10 @@ namespace Friends
         {
             int pos = Program.RANDOM.Next(Program.TRAJECTORY_LENGTH);
 
-            Points[pos] = Points[pos] + RandShift();
+            var x = Points[pos].X + Program.RandShift();
+            var y = Points[pos].Y + Program.RandShift();
+            Points[pos] = new TrajectoryPoint(x, y);
+            //Points[pos] = Points[pos] + RandShift();
 
             ReFit(pos);
 
@@ -80,40 +83,51 @@ namespace Friends
             }
         }
 
+        internal double SimpleDist(Trajectory t, double best)
+        {
+            double totD = TrajectoryPoint.EuclideanDistance(t.Points[0], this.Points[0]);
+
+            if (best == -1)
+            {
+                for (int i = 1; i < Program.TRAJECTORY_LENGTH; i++)
+                    totD += TrajectoryPoint.EuclideanDistance(t.Points[i], this.Points[i]);
+            }
+            else
+            {
+                for (int i = 1; (i < Program.TRAJECTORY_LENGTH) && (totD < best); i++)
+                    totD += TrajectoryPoint.EuclideanDistance(t.Points[i], this.Points[i]);
+            }
+
+            return totD;
+        }
+
         internal void AddNoise()
         {
-            Points = Points.Select(p => p + this.RandNoise()).ToArray();
-        }
+            for (int i = 0; i < Program.TRAJECTORY_LENGTH; i++)
+            {
+                var x = Points[i].X + Program.RandNoise();
+                var y = Points[i].Y + Program.RandNoise();
 
-        private TrajectoryPoint RandNoise()
-        {
-            var x = Program.RandNoise();
-            var y = Program.RandNoise();
-
-            return new TrajectoryPoint(x, y);
-        }
-
-        private TrajectoryPoint RandShift()
-        {
-            var x = Program.RandShift();
-            var y = Program.RandShift();
-
-            return new TrajectoryPoint(x, y);
+                Points[i] = new TrajectoryPoint(x, y);
+            }
         }
 
         private void ReFit(int pos)
         {
-            // check x value
-            if (Points[pos].X < Min)
-                Points[pos] = new TrajectoryPoint(Min, Points[pos].Y);
-            else if (Points[pos].X > Max)
-                Points[pos] = new TrajectoryPoint(Max, Points[pos].Y);
+            var x = Points[pos].X;
+            var y = Points[pos].Y;
 
-            //check y value
-            if (Points[pos].Y < Min)
-                Points[pos] = new TrajectoryPoint(Points[pos].X, Min);
-            else if (Points[pos].Y > Max)
-                Points[pos] = new TrajectoryPoint(Points[pos].X, Max);
+            if (x < Min)
+                x = Min;
+            else if (x > Max)
+                x = Max;
+
+            if (y < Min)
+                y = Min;
+            else if (y > Max)
+                y = Max;
+
+            Points[pos] = new TrajectoryPoint(x, y);
         }
 
         private bool ShiftPoint(double x, double y, int indexToSet)
@@ -137,9 +151,8 @@ namespace Friends
             return false;
         }
 
-
-        internal static double Distance(Trajectory t1, Trajectory t2)
-            => t1.Points.Zip(t2.Points, (a, b) => TrajectoryPoint.EuclideanDistance(a, b)).Sum();
+        //internal static double Distance(Trajectory t1, Trajectory t2)
+        //    => t1.Points.Zip(t2.Points, (a, b) => TrajectoryPoint.EuclideanDistance(a, b)).Sum();
 
     }
 }

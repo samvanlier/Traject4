@@ -69,17 +69,42 @@ namespace Friends
             return noisy;
         }
 
-        public Trajectory Imitate(Trajectory tSaid)
+        public Trajectory Imitate(Trajectory t)
         {
-            int i = this.FindClosest(tSaid);
+            double bestDist = t.SimpleDist(this.Trajectories[0], -1);
 
-            return Trajectories[i];
+            int bestT = 0;
+
+            for (int i = 0; i < Program.TRAJECTORY_NUMBER; i++)
+            {
+                var dist = t.SimpleDist(Trajectories[i], bestDist);
+                if (dist < bestDist)
+                {
+                    bestDist = dist;
+                    bestT = i;
+                }
+            }
+
+            return this.Trajectories[bestT];
         }
 
-        public bool Listen(Trajectory tImit)
+        public bool Listen(Trajectory t)
         {
-            var closest = this.FindClosest(tImit);
-            return ShiftIndex == closest;
+            double bestDist = t.SimpleDist(Trajectories[0], -1);
+
+            int bestT = 0;
+
+            for (int i = 1; i < Program.TRAJECTORY_NUMBER; i++)
+            {
+                var dist = t.SimpleDist(Trajectories[i], bestDist);
+                if (dist < bestDist)
+                {
+                    bestDist = dist;
+                    bestT = i;
+                }
+            }
+
+            return bestT == ShiftIndex;
         }
 
         public void AcceptOrReject(int counter)
@@ -105,21 +130,19 @@ namespace Friends
                 var curr = Trajectories[ShiftIndex];
                 curr.Mix(t);
             }
+
+            Success[ShiftIndex] = Program.BETA * ((double)counter) + (1.0 * Program.BETA) * Success[ShiftIndex];
         }
 
         private TrajectoryPoint[] BackupToTrajectory()
-            => _backup.X.Zip(this._backup.Y, (x, y) => new TrajectoryPoint(x, y)).ToArray();
-
-
-        private int FindClosest(Trajectory tSaid)
         {
-            var tDistances = this.Trajectories
-                .Select(t => Trajectory.Distance(t, tSaid));
-            var smallestDist = tDistances.Min();
+            var points = new TrajectoryPoint[Program.TRAJECTORY_LENGTH];
+            for (int i = 0; i < Program.TRAJECTORY_LENGTH; i++)
+            {
+                points[i] = new TrajectoryPoint(this._backup.X[i], this._backup.Y[i]);
+            }
 
-            var index = tDistances.ToList().IndexOf(smallestDist);
-
-            return index;
+            return points;
         }
 
         class Backup

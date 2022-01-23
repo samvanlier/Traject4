@@ -15,14 +15,13 @@ namespace Friends
         public static readonly int MAX_ITERATIONS = 60000;
         public static readonly int N_TEST = 100;
 
-        public static readonly double MAX_DIST = 10.0; // is r in the paper
+        public static readonly double MAX_DIST = 1.0; // is r in the paper
         public static readonly double SPACE_SIZE = 10.0;
         public static readonly double SIGMA_SHIFT = 1.0;
         public static readonly double SIGMA_NOISE = 2.0;
         public static readonly double BETA = 0.5;
 
         public static readonly Random RANDOM = new Random(1);
-
 
         // normal distributions
         private readonly static Normal Noise = new Normal(0, SIGMA_NOISE, RANDOM);
@@ -64,15 +63,14 @@ namespace Friends
 
                 for (int imitatorIndex = 0; imitatorIndex < AGENT_NUM; imitatorIndex++)
                 {
-                    if (imitatorIndex == initiatorIndex)
-                        continue; // skip... don't need to talk to youself.
-
-                    var imitator = agents[imitatorIndex];
-
-                    for (int i = 0; i < N_TEST; i++)
+                    if (imitatorIndex != initiatorIndex)
                     {
-                        if (PlayGame(initiator, imitator))
-                            success++;
+                        var imitator = agents[imitatorIndex];
+                        for (int indez = 0; indez < N_TEST; indez++)
+                        {
+                            if (PlayGame(initiator, imitator))
+                                success++;
+                        }
                     }
                 }
 
