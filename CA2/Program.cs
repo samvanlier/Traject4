@@ -70,14 +70,14 @@ namespace CA2
         private readonly static Normal Noise = new Normal(0, SIGMA_NOISE, RANDOM);
         internal static double RandNoise() => Noise.Sample();
 
-        private readonly static Normal Shift = new Normal(0, SIGMA_SHIFT);
+        private readonly static Normal Shift = new Normal(0, SIGMA_SHIFT, RANDOM);
         internal static double RandShift() => Shift.Sample();
 
         /// <summary>
         /// 
         /// </summary>
-        //private static int maxIts = 60000; // value paper
-        private readonly static int maxIts = 1000; // value paper
+        private static int maxIts = 60000; // value paper
+        //private readonly static int maxIts = 1000; // value paper
 
         static void Main(string[] args)
         {
@@ -105,34 +105,34 @@ namespace CA2
 
                 var success = 0;
 
-                //for (int indey = 0; indey < AGENT_NUM; indey++)
-                //{
-                //    if (indey != shifter)
-                //    {
-                //        var imitator = agents[indey];
-                //        for (int indez = 0; indey < N_TEST; indez++)
-                //        {
-                //            Debug.WriteLine($"[{DateTime.Now}] PlayGame({shifter}, {initiator.ShiftIndex}, {indey})");
-                //            if (PlayGame(initiator, imitator))
-                //                success++;
-                //        }
-
-                //    }
-                //}
-
-                Parallel.For(0, AGENT_NUM, indey =>
+                for (int indey = 0; indey < AGENT_NUM; indey++)
                 {
                     if (indey != shifter)
                     {
                         var imitator = agents[indey];
                         for (int indez = 0; indez < N_TEST; indez++)
                         {
-                            Debug.WriteLine($"{index}-[{DateTime.Now}] PlayGame({shifter}, {initiator.ShiftIndex}, {indey})");
+                            //Debug.WriteLine($"{index}-[{DateTime.Now}] PlayGame({shifter}, {initiator.ShiftIndex}, {indey})");
                             if (PlayGame(initiator, imitator))
-                                Interlocked.Increment(ref success);
+                                success++;
                         }
+
                     }
-                });
+                }
+
+                //Parallel.For(0, AGENT_NUM, indey =>
+                //{
+                //    if (indey != shifter)
+                //    {
+                //        var imitator = agents[indey];
+                //        for (int indez = 0; indez < N_TEST; indez++)
+                //        {
+                //            Debug.WriteLine($"{index}-[{DateTime.Now}] PlayGame({shifter}, {initiator.ShiftIndex}, {indey})");
+                //            if (PlayGame(initiator, imitator))
+                //                Interlocked.Increment(ref success);
+                //        }
+                //    }
+                //});
 
                 if (index%100 == 0)
                 {
