@@ -408,3 +408,5 @@ Traject4/mono_crash.*.*.json
 
 # ignore output files
 */output/
+R_files/.RData
+R_files/.Rhistory
