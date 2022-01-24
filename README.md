@@ -1,5 +1,5 @@
 # Evolution of Speech
-This porject is part of the course **Evolution of Speech** given by *Bart de Boer* at the [VUB](https://www.vub.be/).
+This project is part of the course **Evolution of Speech** given by *Bart de Boer* at the [VUB](https://www.vub.be/).
 The project is based on [(De Boer and Zuidema, 2010)](https://journals.sagepub.com/doi/abs/10.1177/1059712309345789) and the original source code was provided by *de Boer*.
 
 The following sections will cover the technical details of the project.
@@ -11,7 +11,7 @@ Each project has its own `README`-file describing the project in more details.
 
 **Project overview:**
 - [DTO](./DTO): A project that contains POCO object for converting the internal model to a common JSON output (used by the R-script in [R_files](./R_files))
-- [Friends](./Friends): An updated version of the original project, used to test the hypotesis
+- [Friends](./Friends): An updated version of the original project, used to test the hypothesis
 - [Graph](./Graph): A custom graph library, used for creating the friend network and for importing and exporting the graph
 - [Tests](./Tests): Unit Tests
 - [R_files](./R_files): A folder containing the script used to plot the resulting Trajectories and some example `json`-files
@@ -19,13 +19,20 @@ Each project has its own `README`-file describing the project in more details.
 
 ### Run the projects
 It is advised to use [Visual Studio](https://visualstudio.microsoft.com/).
-The perfomance of the project is very dependend of the type of run.
+The performance of the project is very dependent of the type of run.
 **It is thus advised to run the project in `RELEASE` mode**, instead of debug mode.
 
 ### Potential errors
-Certain project rely on undelying structures and software.
+Certain project rely on underlying structures and software.
 
 TODO: document underlying software.
 
 ## Hypothesis
 TODO
+
+
+## Docs
+Docs are create using for example
+````
+xmldoc2md Friends.dll ./doc
+````
