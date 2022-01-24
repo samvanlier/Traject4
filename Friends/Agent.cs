@@ -5,18 +5,33 @@ using System.Linq;
 
 namespace Friends
 {
+    /// <summary>
+    /// Represents an agent in the simulation.
+    /// </summary>
     public class Agent
     {
         private Backup _backup;
 
         //public ICollection<Agent> Friends { get; set; }
 
+        /// <summary>
+        /// The trajectories an <see cref="Agent"/> knows.
+        /// </summary>
         public Trajectory[] Trajectories { get; private set; }
 
+        /// <summary>
+        /// Index of the <see cref="Trajectory"/> that has been shifted.
+        /// </summary>
         public int ShiftIndex { get; private set; }
 
+        /// <summary>
+        /// An index-array containing the succes values of the <see cref="Trajectories"/> an <see cref="Agent"/> knows.
+        /// </summary>
         internal double[] Success { get; set; }
 
+        /// <summary>
+        /// Initialize the <see cref="Agent"/> with random <see cref="Trajectories"/>.
+        /// </summary>
         public void Initialize()
         {
             Trajectories = new Trajectory[Program.TRAJECTORY_NUMBER];
@@ -29,6 +44,11 @@ namespace Friends
             Success = Enumerable.Repeat(50.0, Program.TRAJECTORY_LENGTH).ToArray();
         }
 
+        /// <summary>
+        /// Select a random <see cref="Trajectory"/> and apply a shift.
+        /// A backup will be made of the <see cref="Trajectory"/> before the shift is applied.
+        /// </summary>
+        /// <seealso cref="Trajectory.Shift"/>
         public void PrepareShift()
         {
             this.ShiftIndex = Program.RANDOM.Next(Program.TRAJECTORY_NUMBER);
@@ -56,6 +76,11 @@ namespace Friends
             trajectoryToShift.Shift();
         }
 
+        /// <summary>
+        /// Return the shifted <see cref="Trajectory"/> with applied noise.
+        /// </summary>
+        /// <returns>A noisy version of the shifted <see cref="Trajectory"/></returns>
+        /// <seealso cref="Trajectory.AddNoise"/>
         public Trajectory Say()
         {
             var toSay = Trajectories[ShiftIndex];
@@ -69,6 +94,13 @@ namespace Friends
             return noisy;
         }
 
+        /// <summary>
+        /// Find the <see cref="Trajectory"/> most similar to <paramref name="t"/>.
+        /// </summary>
+        /// <param name="t">A <see cref="Trajectory"/> spoken by another <see cref="Agent"/></param>
+        /// <returns>The closest <see cref="Trajectory"/> the <see cref="Agent"/> knows given <paramref name="t"/></returns>
+        /// <seealso cref="Agent.Listen(Trajectory)"/>
+        /// <seealso cref="Agent.Say"/>
         public Trajectory Imitate(Trajectory t)
         {
             double bestDist = t.SimpleDist(this.Trajectories[0], -1);
@@ -88,6 +120,12 @@ namespace Friends
             return this.Trajectories[bestT];
         }
 
+        /// <summary>
+        /// Find the index <see cref="Trajectory"/> most similar to <paramref name="t"/> and check if this is the same as the shifted <see cref="Trajectory"/>.
+        /// </summary>
+        /// <param name="t">A <see cref="Trajectory"/> spoken by another <see cref="Agent"/></param>
+        /// <returns>A <see cref="bool"/> indicating if <paramref name="t"/> matches the shifted <see cref="Trajectory"/></returns>
+        /// <seealso cref="Agent.PrepareShift"/>
         public bool Listen(Trajectory t)
         {
             double bestDist = t.SimpleDist(Trajectories[0], -1);
@@ -107,6 +145,11 @@ namespace Friends
             return bestT == ShiftIndex;
         }
 
+        /// <summary>
+        /// Accept or reject the shifted <see cref="Trajectory"/> based on the success <paramref name="counter"/> of this <see cref="Trajectory"/> compared to the success of that <see cref="Trajectory"/> before the shift.
+        /// </summary>
+        /// <param name="counter">A success counter for the shifted <see cref="Trajectory"/></param>
+        /// <see cref="Agent.PrepareShift"/>
         public void AcceptOrReject(int counter)
         {
             if (counter < this.Success[ShiftIndex])

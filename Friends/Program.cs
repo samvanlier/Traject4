@@ -11,28 +11,115 @@ using ScottPlot;
 
 namespace Friends
 {
+    /// <summary>
+    /// The console application 
+    /// </summary>
     public class Program
     {
-
+        /// <summary>
+        /// The number of points a <see cref="Trajectory"/> can have.
+        /// The original value from the original paper is <c>20</c>.
+        /// </summary>
         public static readonly int TRAJECTORY_LENGTH = 20;
+        /// <summary>
+        /// The number of <see cref="Trajectory">trajectories</see> an <see cref="Agent"/> has.
+        /// The original value from the original paper is <c>4</c>.
+        /// </summary>
         public static readonly int TRAJECTORY_NUMBER = 4;
+        /// <summary>
+        /// The number of <see cref="Agent"/>s that are present in the simulation.
+        /// The original value from the original paper is <c>10</c>
+        /// </summary>
         public static readonly int AGENT_NUM = 10;
-        public static readonly int MAX_ITERATIONS = 60000;
+        /// <summary>
+        /// The number of Imitation Games two agents play.
+        /// The original value form the original paper is <c>100</c>.
+        /// </summary>
+        /// <remarks>
+        /// For more information about the Imitation Game, see https://journals.sagepub.com/doi/abs/10.1177/1059712309345789.
+        /// </remarks>
         public static readonly int N_TEST = 100;
+        /// <summary>
+        /// The number of runs a similulation has.
+        /// The original value form the original paper is <c>60000</c>.
+        /// </summary>
+        public static readonly int MAX_ITERATIONS = 60000;
 
+        /// <summary>
+        /// The maximum distance between two neighbouring <see cref="TrajectoryPoint"/>s on the same <see cref="Trajectory"/>.
+        /// The original value form the original paper is <c>1</c>. 
+        /// </summary>
+        /// <remarks>
+        /// Two neighbouring <see cref="TrajectoryPoint"/>s can have a distance between them with a lenght from 0 to <see cref="MAX_DIST"/>.
+        /// </remarks>
         public static readonly double MAX_DIST = 1.0; // is r in the paper
+        /// <summary>
+        /// The space size dictates the size of the X-axis and Y-axis in which <see cref="TrajectoryPoint"/>s can reside.
+        /// The bounderies for both X and Y are (-<see cref="SPACE_SIZE"/>/2, <see cref="SPACE_SIZE"/>/2), creating a square with all sides equal to <see cref="SPACE_SIZE"/>.
+        /// The original value form the original paper is <c>10</c>. 
+        /// </summary>
         public static readonly double SPACE_SIZE = 10.0;
+        /// <summary>
+        /// The standard deviation of Gaussian that is used to shift <see cref="TrajectoryPoint"/>s.
+        /// The original value form the original paper is <c>1</c>.
+        /// </summary>
+        /// <seealso cref="Shift"/>
+        /// <seealso cref="RandShift"/>
+        /// <seealso cref="Agent.PrepareShift"/>
+        /// <seealso cref="Trajectory.Shift"/>
         public static readonly double SIGMA_SHIFT = 1.0;
+        /// <summary>
+        /// The standard deviation for the Gaussian that is used to add noise to a <see cref="TrajectoryPoint"/>.
+        /// The original value form the original paper is <c>2</c>.
+        /// </summary>
+        /// <seealso cref="Noise"/>
+        /// <seealso cref="RandNoise"/>
+        /// <seealso cref="Agent.Say"/>
+        /// <seealso cref="Trajectory.AddNoise"/>
         public static readonly double SIGMA_NOISE = 2.0;
+        /// <summary>
+        /// The mix factor that is used to mix two <see cref="Trajectory"/> objects.
+        /// The original value from the original paper is <c>0.5</c>.
+        /// </summary>
+        /// <seealso cref="Agent.AcceptOrReject(int)"/>
+        /// <seealso cref="Trajectory.Mix(Trajectory)"/>
         public static readonly double BETA = 0.5;
 
+        /// <summary>
+        /// A <see cref="Random"/> that is used by all fucntions that incroporate randomness.
+        /// </summary>
+        /// <remarks>
+        /// This is mainly done for debug reasons (otherwise it is imposseble to unit test)
+        /// </remarks>
         public static readonly Random RANDOM = new Random(1);
 
         // normal distributions
+        /// <summary>
+        /// The Gaussian noise function, used to add noise to a <see cref="Trajectory"/>.
+        /// The mean value is <c>1</c> and the standard deviation is <see cref="SIGMA_NOISE"/>
+        /// </summary>
+        /// <seealso cref="RandNoise"/>
+        /// <seealso cref="Agent.Say"/>
+        /// <seealso cref="Trajectory.AddNoise"/>
         private readonly static Normal Noise = new Normal(0, SIGMA_NOISE, RANDOM);
+        /// <summary>
+        /// The Gaussian noise function, used to add shift to a <see cref="Trajectory"/>.
+        /// The mean value is <c>1</c> and the standard deviation is <see cref="SIGMA_SHIFT"/>
+        /// </summary>
+        /// <seealso cref="RandShift"/>
+        /// <seealso cref="Agent.PrepareShift"/>
+        /// <seealso cref="Trajectory.Shift"/>
         private readonly static Normal Shift = new Normal(0, SIGMA_SHIFT, RANDOM);
 
+        /// <summary>
+        /// Sample a value from the Gaussian distribution defined in <see cref="Noise"/>.
+        /// </summary>
+        /// <returns>A value from the defined Gaussian distribution</returns>
         internal static double RandNoise() => Noise.Sample();
+        /// <summary>
+        /// Sample a value from the Gaussian distribution defined in <see cref="Shift"/>.
+        /// </summary>
+        /// <returns>A value from the defined Gaussian distribution</returns>
         internal static double RandShift() => Shift.Sample();
 
         private static Stopwatch stopwatch;
@@ -58,23 +145,11 @@ namespace Friends
             Console.WriteLine("All finnished");
         }
 
-        private static void PrepOutputFolder()
-        {
-            var curr = Directory.GetCurrentDirectory();
-            var folder = Directory.GetParent(curr).Parent.Parent;
 
-            var sub = folder.GetDirectories();
-            if (!sub.Select(x => x.Name).Contains("output"))
-                output_folder = folder.CreateSubdirectory("output");
-            else
-                output_folder = sub.Where(x => x.Name == "output").First();
-
-            var now = DateTime.Now;
-            var u = now.ToFileTimeUtc();
-            var f = $"{now.Date.Day}_{now.Date.Month}_{now.ToFileTimeUtc()}";
-            output_folder = output_folder.CreateSubdirectory(f);
-        }
-
+        /// <summary>
+        /// Run the simulation in the classic style of the original paper.
+        /// </summary>
+        /// <seealso cref="PlayGame(Agent, Agent)"/>
         private static void RunSimulationClassic()
         {
             IList<Agent> agents = CreateAgents();
@@ -131,6 +206,27 @@ namespace Friends
             SaveToFile(agents, "out.json");
             SaveToFile(runner, "runner.csv");
             PlotToFile(runner, "success.png");
+        }
+
+
+        /// <summary>
+        /// Play an imitation game.
+        /// </summary>
+        /// <param name="initiator">
+        /// An <see cref="Agent"/> that says the shifted <see cref="Trajectory"/> with added noise and validates the result of the <paramref name="imitator"/>
+        /// </param>
+        /// <param name="imitator">
+        /// An <see cref="Agent"/> that tries to imitate the spoken <see cref="Trajectory"/> of the <paramref name="initiator"/>
+        /// </param>
+        /// <returns>
+        /// A <see cref="bool"/> indicating if the <paramref name="imitator"/> has successfully imitated the spoken <see cref="Trajectory"/> of the <paramref name="initiator"/>.
+        /// </returns>
+        /// <seealso cref="RunSimulationClassic"/>
+        private static bool PlayGame(Agent initiator, Agent imitator)
+        {
+            var tSaid = initiator.Say();
+            var tImit = imitator.Imitate(tSaid);
+            return initiator.Listen(tImit);
         }
 
         private static void PlotToFile(double[] runner, string fileName)
@@ -206,11 +302,21 @@ namespace Friends
             return agents;
         }
 
-        private static bool PlayGame(Agent initiator, Agent imitator)
+        private static void PrepOutputFolder()
         {
-            var tSaid = initiator.Say();
-            var tImit = imitator.Imitate(tSaid);
-            return initiator.Listen(tImit);
+            var curr = Directory.GetCurrentDirectory();
+            var folder = Directory.GetParent(curr).Parent.Parent;
+
+            var sub = folder.GetDirectories();
+            if (!sub.Select(x => x.Name).Contains("output"))
+                output_folder = folder.CreateSubdirectory("output");
+            else
+                output_folder = sub.Where(x => x.Name == "output").First();
+
+            var now = DateTime.Now;
+            var u = now.ToFileTimeUtc();
+            var f = $"{now.Date.Day}_{now.Date.Month}_{now.ToFileTimeUtc()}";
+            output_folder = output_folder.CreateSubdirectory(f);
         }
     }
 }
