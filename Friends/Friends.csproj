@@ -7,8 +7,14 @@
 
   <ItemGroup>
     <None Remove="MathNet.Numerics" />
+    <None Remove="ScottPlot" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
+		<PackageReference Include="ScottPlot" Version="4.1.29" />
+		<PackageReference Include="System.Drawing.Common" Version="4.7.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DTO\DTO.csproj" />
   </ItemGroup>
 </Project>

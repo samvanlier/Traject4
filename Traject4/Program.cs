@@ -1,6 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using DTO;
 using MathNet.Numerics.Distributions;
+using ScottPlot;
 
 namespace Traject4
 {
@@ -74,11 +80,11 @@ namespace Traject4
         /// </summary>
         private static int maxIts = 60000; // value paper
         //private readonly static int maxIts = 1000; // value paper
+        private static DirectoryInfo output_folder;
 
         static void Main(string[] args)
         {
-            // TODO port c++ code (again with arrays this time)
-            // if this runs well, rebuild to what CA looks like (with points instead of arrays)
+            PrepOutputFolder();
 
             // create agents
             var agents = new Agent[AGENT_NUM];
@@ -91,6 +97,7 @@ namespace Traject4
             Console.WriteLine("agents initialized");
 
             // main loop
+            var runner = new double[maxIts];
             var runAvg = 0.0;
             for (int index = 0; index < maxIts; index++)
             {
@@ -137,10 +144,16 @@ namespace Traject4
                 }
 
                 runAvg = runAvg * 0.999 + 0.001 * ((double)success / (N_TEST * (AGENT_NUM - 1.0)));
+                runner[index] = runAvg;
                 initiator.AcceptOrReject(success);
             }
             Console.WriteLine($"{maxIts}\t" +
                         $"runAvg = {runAvg}");
+
+            SaveToFile(agents, "out.json");
+            SaveToFile(runner, "runner.csv");
+            PlotToFile(runner, "success.png");
+
             Console.WriteLine("done");
         }
 
@@ -149,6 +162,80 @@ namespace Traject4
             var tSaid = initiator.Say();
             Trajectory tImit = imitator.Imitate(tSaid);
             return initiator.Listen(tImit);
+        }
+
+        private static void PrepOutputFolder()
+        {
+            var curr = Directory.GetCurrentDirectory();
+            var folder = Directory.GetParent(curr).Parent.Parent;
+
+            var sub = folder.GetDirectories();
+            if (!sub.Select(x => x.Name).Contains("output"))
+                output_folder = folder.CreateSubdirectory("output");
+            else
+                output_folder = sub.Where(x => x.Name == "output").First();
+
+            var now = DateTime.Now;
+            var u = now.ToFileTimeUtc();
+            var f = $"{now.Date.Day}_{now.Date.Month}_{now.ToFileTimeUtc()}";
+            output_folder = output_folder.CreateSubdirectory(f);
+        }
+
+        private static void SaveToFile(double[] runner, string fileName)
+        {
+            var file = Path.Combine(output_folder.FullName, fileName);
+            StringBuilder sb = new StringBuilder();
+            sb.Append("index;runAvg");
+            sb.Append("\n");
+
+            var s = string.Join("\n", runner.Select((r, i) => $"{i};{r}"));
+            sb.Append(s);
+
+            var r = sb.ToString();
+            File.WriteAllText(fileName, r);
+        }
+
+        private static void SaveToFile(IList<Agent> agents, string fileName)
+        {
+            var dtos = agents
+                .Select((a, i) =>
+                {
+                    var trajectories = a.Trajectories
+                        .Select((t, i) =>
+                            new TrajectoryDTO()
+                            {
+                                Id = i,
+                                X = t.X,
+                                Y = t.Y,
+                            })
+                        .ToArray();
+
+                    return new AgentDTO()
+                    {
+                        Id = i,
+                        Trajectories = trajectories
+                    };
+                })
+                .ToArray();
+
+            var file = Path.Combine(output_folder.FullName, fileName);
+
+            dtos.SaveAsJson(file);
+        }
+
+        private static void PlotToFile(double[] runner, string fileName)
+        {
+            var file = Path.Combine(output_folder.FullName, fileName);
+            Console.WriteLine("plot chart:");
+
+            var plt = new Plot();
+            plt.AddSignal(runner);
+            plt.Title("Average success over time");
+            plt.XLabel("iteration");
+            plt.YLabel("success");
+            plt.SaveFig(file);
+
+            Console.WriteLine("plotting done.");
         }
     }
 }

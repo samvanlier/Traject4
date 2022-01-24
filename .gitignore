@@ -405,3 +405,6 @@ ASALocalRun/
 .localhistory/
 Traject4/mono_crash.*.*.json
 .vscode/*
+
+# ignore output files
+*/output/

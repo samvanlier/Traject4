@@ -2,7 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using DTO;
 using MathNet.Numerics.Distributions;
+using ScottPlot;
 
 namespace Friends
 {
@@ -30,20 +35,51 @@ namespace Friends
         internal static double RandNoise() => Noise.Sample();
         internal static double RandShift() => Shift.Sample();
 
+        private static Stopwatch stopwatch;
+        private static DirectoryInfo output_folder;
+
         static void Main(string[] args)
         {
             Console.WriteLine("Evolution of speech: simulation");
             Console.WriteLine("==============================================");
+            PrepOutputFolder();
 
-            Stopwatch stopwatch = new Stopwatch(); // monitor time
+            stopwatch = new Stopwatch(); // monitor time
 
             RunSimulationClassic();
 
+            TimeSpan t = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
+            string elapsedTime = string.Format("{0:D2}h:{1:D2}m:{2:D2}s:{3:D3}ms",
+                                    t.Hours,
+                                    t.Minutes,
+                                    t.Seconds,
+                                    t.Milliseconds);
+            Console.WriteLine($"run time: {elapsedTime}");
+            Console.WriteLine("All finnished");
+        }
+
+        private static void PrepOutputFolder()
+        {
+            var curr = Directory.GetCurrentDirectory();
+            var folder = Directory.GetParent(curr).Parent.Parent;
+
+            var sub = folder.GetDirectories();
+            if (!sub.Select(x => x.Name).Contains("output"))
+                output_folder = folder.CreateSubdirectory("output");
+            else
+                output_folder = sub.Where(x => x.Name == "output").First();
+
+            var now = DateTime.Now;
+            var u = now.ToFileTimeUtc();
+            var f = $"{now.Date.Day}_{now.Date.Month}_{now.ToFileTimeUtc()}";
+            output_folder = output_folder.CreateSubdirectory(f);
         }
 
         private static void RunSimulationClassic()
         {
             IList<Agent> agents = CreateAgents();
+
+            SaveToFile(agents, "init.json");
 
             Console.WriteLine("Start simulation:");
 
@@ -87,7 +123,71 @@ namespace Friends
 
             Console.WriteLine($"{MAX_ITERATIONS}\t" +
                         $"runAvg = {runAvg}");
-            Console.WriteLine("done");
+            Console.WriteLine("done running simulations");
+            stopwatch.Stop();
+
+            Console.WriteLine("print output files:");
+            // print agents to json files.
+            SaveToFile(agents, "out.json");
+            SaveToFile(runner, "runner.csv");
+            PlotToFile(runner, "success.png");
+        }
+
+        private static void PlotToFile(double[] runner, string fileName)
+        {
+            var file = Path.Combine(output_folder.FullName, fileName);
+            Console.WriteLine("plot chart:");
+
+            var plt = new Plot();
+            plt.AddSignal(runner);
+            plt.Title("Average success over time");
+            plt.XLabel("iteration");
+            plt.YLabel("success");
+            plt.SaveFig(file);
+
+            Console.WriteLine("plotting done.");
+        }
+
+        private static void SaveToFile(double[] runner, string fileName)
+        {
+            var file = Path.Combine(output_folder.FullName, fileName);
+            StringBuilder sb = new StringBuilder();
+            sb.Append("index;runAvg");
+            sb.Append("\n");
+
+            var s = string.Join("\n", runner.Select((r, i) => $"{i};{r}"));
+            sb.Append(s);
+
+            var r = sb.ToString();
+            File.WriteAllText(fileName, r);
+        }
+
+        private static void SaveToFile(IList<Agent> agents, string fileName)
+        {
+            var dtos = agents
+                .Select((a, i) =>
+                {
+                    var trajectories = a.Trajectories
+                        .Select((t, i) =>
+                            new TrajectoryDTO()
+                            {
+                                Id = i,
+                                X = t.Points.Select(p => p.X).ToArray(),
+                                Y = t.Points.Select(p => p.Y).ToArray(),
+                            })
+                        .ToArray();
+
+                    return new AgentDTO()
+                    {
+                        Id = i,
+                        Trajectories = trajectories
+                    };
+                })
+                .ToArray();
+
+            var file = Path.Combine(output_folder.FullName, fileName);
+
+            dtos.SaveAsJson(file);
         }
 
         private static IList<Agent> CreateAgents()
