@@ -55,7 +55,7 @@ namespace Traject4
         /// <summary>
         /// 
         /// </summary>
-        public readonly static Random RANDOM = new Random(1);
+        public readonly static Random RANDOM = new Random();
 
         /// <summary>
         /// 
@@ -95,6 +95,8 @@ namespace Traject4
             }
 
             Console.WriteLine("agents initialized");
+            SaveToFile(agents, "init.json");
+
 
             // main loop
             var runner = new double[maxIts];
@@ -122,20 +124,6 @@ namespace Traject4
 
                     }
                 }
-
-                //Parallel.For(0, AGENT_NUM, indey =>
-                //{
-                //    if (indey != shifter)
-                //    {
-                //        var imitator = agents[indey];
-                //        for (int indez = 0; indez < N_TEST; indez++)
-                //        {
-                //            Debug.WriteLine($"{index}-[{DateTime.Now}] PlayGame({shifter}, {initiator.ShiftIndex}, {indey})");
-                //            if (PlayGame(initiator, imitator))
-                //                Interlocked.Increment(ref success);
-                //        }
-                //    }
-                //});
 
                 if (index % 100 == 0)
                 {

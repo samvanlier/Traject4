@@ -46,7 +46,7 @@ namespace Friends
         /// The number of runs a simulation has.
         /// The original value form the original paper is <c>60000</c>.
         /// </summary>
-        public static readonly int MAX_ITERATIONS = 60000;
+        public static readonly int MAX_ITERATIONS = 600000;
         /// <summary>
         /// The average number of friends an <see cref="Agent"/> has to start with.
         /// Together with <see cref="AGENT_NUM"/>, this will decide on the number of edges (connections/friendships) found in the network graph.
@@ -103,7 +103,7 @@ namespace Friends
         /// <remarks>
         /// This is mainly done for debug reasons (otherwise it is impossible to unit test)
         /// </remarks>
-        public static readonly Random RANDOM = new Random(1);
+        public static readonly Random RANDOM = new Random();
 
         // normal distributions
         /// <summary>
@@ -328,6 +328,8 @@ namespace Friends
                     }
 
                     // introduce to new friend (see note and numpy.choice)
+                    // todo make check for number of edges stays 500?
+                    // is that required?
 
                     int newFriendId = initiator.FoaF(RANDOM);
                     if (newFriendId != -1)
