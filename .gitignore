@@ -410,3 +410,15 @@ Traject4/mono_crash.*.*.json
 */output/
 R_files/.RData
 R_files/.Rhistory
+
+# ignore latex
+*.fls
+*.aux
+*.bbl
+*.blg
+*.out
+*.synctex.gz
+*.fdb_latexmk
+Paper/main.pdf
+R_files/init.json
+R_files/out.json

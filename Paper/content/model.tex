@@ -1,0 +1,92 @@
+\section{The Model}
+The model that is used in this paper is very similar to the model described in \citep*{de2010multi}.
+To recap, the model consists of a population of agents.
+Each agents has four trajectories, with each trajectory having 20 points each.
+These points have to adhere to a few constraints, first of all, they are bound in a space of size 10 units.
+Secondly, neighboring points on a trajectory can have a maximum euclidean distance of 1 unit between them.
+
+The goal of the model is to shift these trajectories so that acoustic distinction is achieved.
+This paper aims to do this as wel, so almost all other functions, methods and parameters are borrowed from \cite*{de2010multi};
+
+\subsection{The Social Network}
+As mentioned before, this model is based on the model of \citeauthor{de2010multi}, but introduces social dynamics.
+The original work used a population of 10 agents, which is never enough for a social network.
+This resulted in the choice of increasing the number of agents to 100.
+
+The social network that is used is a random network, which is made using the \textbf{Erdős–Rényi model} \citep*{erdos1959r}.
+This model has been tweaked to make sure all nodes in the network are connected.
+This is done before the \textbf{Erdős–Rényi model} starts working.
+This has been done to ensure that every agent has at least one friend.
+
+To make sure agents have enough opportunities to play the \textit{Imitation Game}, the number of edges has been chosen to be 500.
+This is the number of edges needed to have an overall average degree of 10 in the network.
+This can be checked using the Handshake-lemma of Euler.
+\[
+    \sum_{v \in V} deg(v) = 2 |E|
+\]
+with $V$ being the nodes in a graph and $E$ the edges of the graph.
+$deg(v)$ is the degree of a node, also known as the number of connected edges to that node.
+The average degree can be written as:
+\[
+    \frac{
+        \sum_{v \in V} deg(v)
+    }{|V|} = 10
+    \Leftrightarrow
+    \sum_{v \in V} deg(v) = 10 * |V|
+\]
+Now we substitute $\sum_{v \in V} deg(v)$ with $2|E|$ and solve the equation, resulting in:
+\[    
+    |E| = 5 * |V|
+\]
+
+The average degree of 10 was chosen so that the overall number of games per iteration are similar to the original work.
+
+\subsection{Changing The Social Network}
+During a simulation, the relationships between the agents can change.
+Friends come and go, and can even reconnect, creating a network that is different every iteration of the simulation.
+
+The relations can be changed in two ways, \textit{Friend of a Friend} (FoaF for short) and \textit{having a falling out}.
+FoaF is term borrowed from ontologies but it fits for what this does.
+\textit{Friend of a Friend} in this context means the introduction of a new friend via an already connected friend.
+To place this is a real-life context, you go to a house party of our friend and he/she introduces you to a new person, this person is a \textit{Friend of a Friend}.
+But agents can also have a \textit{falling out}.
+In more concrete terms, they have a fight/argument and don't want to talk to each other for a time.
+The agents in question disappear from each other friend list and cannot talk to each other anymore.
+How both method work are explained in the following two subsections.
+
+Both methods can produce unwanted results.
+FoaF can lead to a fully connected network, where everyone talks to everyone else and \textit{having a falling out} can lead to lonely agents with no friends.
+So this has to be countered and this can be done by doing both, but with some restrictions.
+If an agents has less then 2 friends, no friend is removed.
+This makes sure that no lonely agents exists.
+Also, agents cannot suggest friends that are already in the friend list of the other agent, it is not a \textit{Friend of a Friend} if an agent is already friends with them.
+So this could lead to a situation where there are new friends to suggest, so in this case the friend list does not grow.
+
+\subsubsection{Friend of a Friend}
+To select the FoaF, a friend needs to be picked that is suited to suggest a new friend to this agent.
+This friend is chosen based on the following chance:
+\begin{equation}
+    P(friend) = \frac{|Friend.Friends|}{PotFoaFs(a)}
+\end{equation}
+$PotFoaFs(a)$ is defined as
+\[
+    PotFoaFs(a) = \sum_{f \in a.Friends} |f.Friends|
+\]
+which are all potential FoaF candidates (including the mutual friends).
+
+This gives agents that are more social (e.i. have more friends) a higher change of being select to suggest a friend.
+The suggested FoaF friend, however, is a random agent from the friend-list of the select friend.
+
+\subsubsection{Having a falling out}
+Agents can have a falling out, which means they are removed from each others friend-lists.
+\textit{Falling outs} are based on the communication success between these agents.
+In a single iteration of the simulation, an agent plays the \textit{Imitation game} with every friend it has for a number of times.
+A success counter is kept to see what the success of the game was with every friend.
+When a friends needs to be pick to remove from the friend-list, it is done using the following probability:
+\begin{equation}
+    P(friend) = \frac{friend.Succes}{OverallSuccess}
+\end{equation}
+$OverallSuccess$ is the total number of successful \textit{Imitation games} in the iteration.
+
+If $OverallSuccess = 0$ then a random friend is picked to remove from the friend-list.
+As mentioned before, this is not done when the selected friend or current agent has less than two friends.

@@ -1,0 +1,38 @@
+\section{Results}
+The simulations follow a similar pattern to what \cite{de2010multi} did.
+First a social network of new agents is created and than the simulation is started.
+In every iteration a random agent is select from the network and shifts a random trajectory.
+It then plays 100 \textit{Imitation Games} with every friend it has, to get a success value of this shifted trajectory.
+After these games, an accept or reject is done based on the number of successful \textit{Imitation Games}.
+If the trajectory is accepted, a mix between the original trajectory and the shifted trajectory is made and stored in the agent (the success value for this trajectory is also updated as seen in \citep{de2010multi}).
+After this is done, the agent has a \textit{falling out} with one of its friends (if it has more then two) based on the success of the \textit{Imitation Game} the two agents played.
+Finally, the agent is presented with a new friend via the FoaF method where a friend of the agent, suggest a new friend.
+And then the next iteration starts.
+
+\begin{table}[t]
+    \centering
+    \begin{tabular}{ll}
+    \hline
+    Parameter                                         & Value  \\ \hline
+    Number of Iterations                              & 600000 \\
+    Number of games                                   & 100    \\
+    $\sigma_{noise}$                                  & 2.0    \\
+    $\sigma_{shift}$                                  & 1.0    \\
+    $\beta$ (mix-factor)                              & 0.5    \\
+    Number of agents                                  & 100    \\
+    Number of trajectories                            & 4      \\
+    Trajectory length                                 & 20     \\
+    Maximum distance between neighboring points ($R$) & 1.0    \\
+    Space size                                        & 10     \\
+    Average number of friends                         & 10    
+\end{tabular}
+    \caption{Table to test captions and labels.}
+    \label{table:simulation}
+\end{table}
+
+The results presented in the paper where achieved by running the simulation with the values found in \autoref{table:simulation}.
+Most of the values are identical to the simulation parameters found in \citep*{de2010multi}.
+
+% todo create plots and place them in the paper
+
+% todo write rest of paper
