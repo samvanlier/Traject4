@@ -12,7 +12,22 @@ namespace Friends
     {
         private Backup _backup;
 
-        //public ICollection<Agent> Friends { get; set; }
+        /// <summary>
+        /// A unique identifier.
+        /// This is also the node number in the network.
+        /// </summary>
+        public int Id { get; set; }
+        /// <summary>
+        /// A friends list.
+        /// This contains all <see cref="Agent"/>s that are directly connected to this <see cref="Agent"/>.
+        /// </summary>
+        public ICollection<Agent> Friends { get; set; }
+
+        ///// <summary>
+        ///// Ex-friend list.
+        ///// These are the <see cref="Agent"/>s which were at some point in time friends with this <see cref="Agent"/>, but had a falling out and are not on speaking terms.
+        ///// </summary>
+        //public ICollection<Agent> Enemies { get; set; }
 
         /// <summary>
         /// The trajectories an <see cref="Agent"/> knows.
@@ -174,7 +189,7 @@ namespace Friends
                 curr.Mix(t);
             }
 
-            Success[ShiftIndex] = Program.BETA * ((double)counter) + (1.0 * Program.BETA) * Success[ShiftIndex];
+            Success[ShiftIndex] = Program.BETA * ((double)counter) + (1.0 - Program.BETA) * Success[ShiftIndex];
         }
 
         private TrajectoryPoint[] BackupToTrajectory()

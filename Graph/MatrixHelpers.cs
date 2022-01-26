@@ -22,15 +22,11 @@ namespace Graph
 
             for (int i = 0; i < matrix.GetLength(0); i++) // rows
             {
-                Console.Write(i + "\t");
                 for (int j = 0; j < matrix.GetLength(1); j++) // columns
                 {
-
                     sb.Append(matrix[i, j] + "\t");
-                    Console.Write(matrix[i, j] + "\t");
                 }
                 sb.Append("\n");
-                Console.WriteLine();
             }
 
             return sb.ToString();

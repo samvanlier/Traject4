@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Graph
 {
-    internal static class RandomExtentions
+    public static class RandomExtentions
     {
         /// <summary>
         /// Pick a random element from <paramref name="choices"/> with a given distribution <paramref name="p"/>
@@ -16,12 +16,6 @@ namespace Graph
         /// <returns></returns>
         public static T Choice<T>(this Random rnd, IEnumerable<T> choices, IEnumerable<double> p = null)
         {
-#if DEBUG
-            if (choices == null)
-            {
-                Console.WriteLine("HELP....");
-            }
-#endif
             int length = choices.Count();
 
             if (p == null) // pick uniform random
@@ -30,11 +24,9 @@ namespace Graph
             if (p.Count() != length)
                 throw new ArgumentException($"The length of choices and p have to be equal. choices.Count()={length}, p.Count()={p.Count()}");
 
-            if (Math.Round(p.Sum(), 10) != 1.000)
-                throw new ArgumentException($"The sum of the probabilities (p) has to be 1. sum={p.Sum()}");
-
             var cumP = new List<double>();
             double last = 0;
+            var t = p.ToArray();
             foreach (var cur in p)
             {
                 last += cur;
@@ -61,5 +53,9 @@ namespace Graph
         /// <returns></returns>
         public static int Choice(this Random rnd, int n, IEnumerable<double> p = null)
             => rnd.Choice(Enumerable.Range(0, n), p);
+
+
+        private static bool Equals3DigitPrecision(this double left, double right)
+            => Math.Abs(left - right) < 0.001;
     }
 }

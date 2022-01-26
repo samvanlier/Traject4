@@ -15,7 +15,7 @@ namespace Graph
         /// <param name="nodes"></param>
         /// <param name="edges"></param>
         /// <param name="random"></param>
-        public RandomGraph(int nodes, int edges, Random random) : base(nodes)
+        public RandomGraph(int nodes, int edges, Random random, bool isFullyConnected = false) : base(nodes)
         {
             // checks
             if (nodes < 2)
@@ -31,55 +31,129 @@ namespace Graph
             _random = random;
             // populate matrix
             double split = (double)edges / check;
-            if (split < 0.5)
+
+            if (!isFullyConnected)
             {
-                Debug.WriteLine("Use the regular Erdős–Rényi model");
-                Enumerable
-                    .Range(0, edges)
-                    .AsParallel()
-                    //.WithDegreeOfParallelism(1) // single threaded (for debug)
-                    .ForAll(i =>
-                    {
-                        Debug.WriteLine($"[{i}] Thread ID:{Thread.CurrentThread.ManagedThreadId}");
-
-                        bool connected = false;
-
-                        while (!connected)
+                if (split < 0.5)
+                {
+                    Debug.WriteLine("Use the regular Erdős–Rényi model");
+                    Enumerable
+                        .Range(0, edges)
+                        .AsParallel()
+                        //.WithDegreeOfParallelism(1) // single threaded (for debug)
+                        .ForAll(i =>
                         {
-                            int a = _random.Next(nodes - 1);
-                            int b = _random.Next(nodes - 1);
+                            Debug.WriteLine($"[{i}] Thread ID:{Thread.CurrentThread.ManagedThreadId}");
 
-                            if (a != b && !IsConnected(a, b))
+                            bool connected = false;
+
+                            while (!connected)
                             {
-                                Connect(a, b);
-                                connected = true;
-                            }
+                                int a = _random.Next(nodes - 1);
+                                int b = _random.Next(nodes - 1);
 
-                        }
-                    });
+                                if (a != b && !IsConnected(a, b))
+                                {
+                                    Connect(a, b);
+                                    connected = true;
+                                }
+
+                            }
+                        });
+                }
+                else
+                {
+                    Debug.WriteLine("Use the reverse Erdős–Rényi model");
+                    // create fully connected graph
+                    Enumerable.Range(0, nodes)
+                        .AsParallel()
+                        .ForAll(i =>
+                        {
+                            for (int j = i; j < nodes; j++)
+                            {
+                                if (i != j)
+                                    Connect(i, j);
+                            }
+                        });
+
+                    while (NumberOfEdges != edges)
+                    {
+                        int a = _random.Next(nodes - 1);
+                        int b = _random.Next(nodes - 1);
+
+                        if (a != b && IsConnected(a, b))
+                            Disconnect(a, b);
+                    }
+                }
             }
             else
             {
-                Debug.WriteLine("Use the reverse Erdős–Rényi model");
-                // create fully connected graph
-                Enumerable.Range(0, nodes)
-                    .AsParallel()
-                    .ForAll(i =>
-                    {
-                        for (int j = i; j < nodes; j++)
-                        {
-                            if (i != j)
-                                Connect(i, j);
-                        }
-                    });
-
-                while (NumberOfEdges != edges)
+                if (split < 0.5)
                 {
-                    int a = _random.Next(nodes - 1);
-                    int b = _random.Next(nodes - 1);
+                    Debug.WriteLine("Use the regular Erdős–Rényi model");
 
-                    if (a != b && IsConnected(a, b))
-                        Disconnect(a, b);
+                    for (int i = 0; i < nodes - 1; i++)
+                    {
+                        var degree = NodeDegrees[i + 1];
+                        if (degree != 0)
+                            continue;
+                        Connect(i, i + 1);
+                    }
+
+                    Enumerable
+                        .Range(0, edges - this.NumberOfEdges)
+                        .AsParallel()
+                        //.WithDegreeOfParallelism(1) // single threaded (for debug)
+                        .ForAll(i =>
+                        {
+                            Debug.WriteLine($"[{i}] Thread ID:{Thread.CurrentThread.ManagedThreadId}");
+
+                            bool connected = false;
+
+                            while (!connected)
+                            {
+                                int a = _random.Next(nodes - 1);
+                                int b = _random.Next(nodes - 1);
+
+                                if (a != b && !IsConnected(a, b))
+                                {
+                                    Connect(a, b);
+                                    connected = true;
+                                }
+                            }
+                        });
+
+                    // check unconnected nodes
+                    var unconnectedNodes = NodeDegrees
+                        .Select((index, degree) => new { index, degree })
+                        .Where(node => node.degree == 0)
+                        .Select(node => node.index)
+                        .ToArray();
+
+                }
+                else
+                {
+                    Debug.WriteLine("Use the reverse Erdős–Rényi model");
+                    // create fully connected graph
+                    Enumerable.Range(0, nodes)
+                        .AsParallel()
+                        .ForAll(i =>
+                        {
+                            for (int j = i; j < nodes; j++)
+                            {
+                                if (i != j)
+                                    Connect(i, j);
+                            }
+                        });
+
+                    while (NumberOfEdges != edges)
+                    {
+                        int a = _random.Next(nodes - 1);
+                        int b = _random.Next(nodes - 1);
+
+                        if (a != b && IsConnected(a, b) && NodeDegrees[a] > 1 && NodeDegrees[b] > 1)
+                            Disconnect(a, b);
+                    }
                 }
             }
         }

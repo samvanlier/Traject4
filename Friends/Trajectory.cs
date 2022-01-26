@@ -85,7 +85,6 @@ namespace Friends
             var x = Points[pos].X + Program.RandShift();
             var y = Points[pos].Y + Program.RandShift();
             Points[pos] = new TrajectoryPoint(x, y);
-            //Points[pos] = Points[pos] + RandShift();
 
             ReFit(pos);
 
@@ -135,7 +134,7 @@ namespace Friends
             // <=>
             // a >= b*b
             var dist = (difx * difx) + (dify * dify);
-            if (dist >= Program.MAX_DIST * Program.MAX_DIST)
+            if (dist > Program.MAX_DIST * Program.MAX_DIST)
             {
                 dist = Program.MAX_DIST / Math.Sqrt(dist);
                 var xToSet = x - difx * dist;

@@ -128,8 +128,7 @@ namespace Traject4
 
                 curr.Mix(t, Program.BETA);
             }
-
-            Success[ShiftIndex] = Program.BETA * ((double)success) + (1.0 * Program.BETA) * Success[ShiftIndex];
+            Success[ShiftIndex] = Program.BETA * ((double)success) + (1.0 - Program.BETA) * Success[ShiftIndex];
         }
     }
 }

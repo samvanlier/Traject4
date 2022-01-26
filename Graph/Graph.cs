@@ -96,7 +96,6 @@ namespace Graph
         public static int MaxNumberOfEdges(int nodes)
             => (int)Math.Ceiling(nodes * (nodes - 1.0) / 2.0);
 
-
         public string PrintMatrix()
             => Matrix.Print2DArray();
     }
