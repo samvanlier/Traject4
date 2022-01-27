@@ -1,7 +1,8 @@
+setwd("~/Projects/Traject4/R_files")
 library("rjson")
 
-init <- fromJSON(file = "init.json")
-out <- fromJSON(file = "out.json")
+init <- fromJSON(file = "./init.json")
+out <- fromJSON(file = "./out.json")
 
 plot_json <- function(data){
   plot(range(-5,5),

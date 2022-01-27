@@ -1,3 +1,53 @@
 \appendix
 \section{Appendix}
-% todo write pseudo-code
+\begin{algorithm}[b]
+    \caption{DISTRIBUTED OPTIMIZATION($A$)}
+    \label{algo:1}
+    \begin{algorithmic}[2]
+        \State $\%$ $A$ is the population of agents  in a network
+        
+        \Loop{$N_{iterations}$ \textbf{time}}
+            \State $initiator \leftarrow $ random agent from $A$
+            \State $T_{original} \leftarrow $ random trajectory from $initiator$
+            \State $T_{shifted} \leftarrow $ SHIFT TRAJECTORY($T_{original}$, $\sigma_{shift}$)
+            \State $T_{shifted}.success \leftarrow 0$
+            \State replace $T_{original}$ with $T_{shifted}$ in $initiator$
+
+            \State $fs \leftarrow$ new array[$|initiator.friends|$] $\%$ friend success array 
+
+            \For{\textbf{each} $(index, imitator) \in initiator.friends$}
+                \Loop{$N_{test}$ \textbf{times}}
+                    \State $gameSuccess \leftarrow$ PLAY GAME($initiator$, $T_{shifted}$, $imitator$)
+                    \State $T_{shifted}.success \leftarrow T_{shifted}.success + gameSuccess$
+                   \State $fs_{index} \leftarrow fs_{index} +  gameSuccess$
+                \EndLoop
+            \EndFor
+
+            \If{$\frac{T_{shifted}.success}{N_{test} * |initiator.friends|}$}
+                \State restore $T_{original}$ in $initiator$
+                \State $T_{original}.success \leftarrow \beta \cdot T_{original}.success + (1+\beta)\frac{T_{shifted}.success}{N_{test} * |initiator.friends|}$
+            \Else
+                \State $T_{new} \leftarrow$ MIX TRAJECTORIES($T_{original}$, $T_shifted$, $\alpha$)
+                \State $T_{new}.success \leftarrow \beta \cdot T_{original}.success + (1+\beta)\frac{T_{shifted}.success}{N_{test} * |initiator.friends|}$
+            \EndIf
+
+            \State $\%$ change social network
+            \If{$|initator.friends| > 2$}
+                \State remove friend $i$ with $P(i) = fs_i/success$
+            \EndIf
+
+            \State $foaf \leftarrow$ select $a$ from $initiator.friends$ with $P(a) = \frac{a.friends}{PotFoaFs(initiator)}$ 
+            \State add $foaf$ to $initiator.friends$
+        \EndLoop 
+    \end{algorithmic}
+\end{algorithm}
+
+This section contains the pseudo-code that differs from what is found in the original work by \cite{de2010multi}.
+A full implementation of the project is available on Github\footnote{https://github.com/samvanlier/Traject4} and contains both the model presented in this paper and the model described in \citep{de2010multi} based on the code provide by de Boer.
+The main method that is changed can be found is Algorithm \autoref{algo:1}.
+
+The notation used is similar to the notation used in \citep*{de2010multi}.
+Function calls are in all capitals, object-oriented calls to properties are with a . as seen in C and other C-like language, variable names are italic and assignment is done by arrow.
+Other commands are written out in words and are more implementation depended.
+Comments are preceded with a $\%$ sign.
+
