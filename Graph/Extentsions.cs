@@ -89,6 +89,7 @@ namespace Graph
 
         public static void SaveToPdf(this Graph g, string fileName)
         {
+            Console.WriteLine("Print graph to pdf file");
             var pairs = new HashSet<Pair>();
 
             for (int a = 0; a < g.NumberOfNodes; a++)
