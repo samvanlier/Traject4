@@ -137,7 +137,7 @@ namespace Friends
         /// <summary>
         /// Indicates if the social dynamics of the <see cref="Agent"/> network can change or not.
         /// </summary>
-        private static readonly bool _changeFriends = true;
+        private static readonly bool _changeFriends = false;
 
         #endregion
 
@@ -153,6 +153,7 @@ namespace Friends
             PrepOutputFolder();
 
             var stopwatch = new Stopwatch(); // monitor time
+            stopwatch.Start();
 
             //RunSimulationClassic();
             RunFriendSimulation();
@@ -268,8 +269,13 @@ namespace Friends
 
             // todo print network to file
             SaveToFile(network, "initNetwork.pdf");
+            var printAgents = Enumerable.Range(0, 10)
+                .Select(i => RANDOM.Next(AGENT_NUM))
+                .Select(i => agents[i])
+                .ToArray();
 
             // save inital agents to file
+            SaveToFile(printAgents, "init10.json");
             SaveToFile(agents, "init.json");
 
             Console.WriteLine("Start simulation:");
@@ -342,6 +348,7 @@ namespace Friends
             Console.WriteLine("print output files:");
             // print agents to json files.
             SaveToFile(agents, "out.json");
+            SaveToFile(printAgents, "out10.json");
             SaveToFile(runner, "runner.csv");
             PlotToFile(runner, "success.png");
             // todo print network to file
