@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Graph;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -59,6 +60,25 @@ namespace GraphTests
             Assert.AreEqual(expected.Length, connectedNodes.Length);
 
             CollectionAssert.AreEqual(expected, connectedNodes);
+        }
+
+        [TestMethod]
+        public void TestPrintToPDF()
+        {
+            int n = 10; // nodes
+            int k = 40; // edges
+
+            var g = new RandomGraph(n, k, _random);
+
+            Assert.AreEqual(k, g.NumberOfEdges);
+            // test with handshake (https://en.wikipedia.org/wiki/Handshaking_lemma#Definitions_and_statement)
+            int sumDegree = g.NodeDegrees.Select(i => (int)i).Sum();
+            Assert.AreEqual(k * 2, sumDegree);
+
+            var file = "./output.pdf";
+            g.SaveToPdf(file);
+
+            Assert.IsTrue(File.Exists(file));
         }
     }
 }

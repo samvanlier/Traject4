@@ -142,10 +142,6 @@ namespace Friends
         #endregion
 
         /// <summary>
-        /// Monitor simulation time
-        /// </summary>
-        private static Stopwatch stopwatch;
-        /// <summary>
         /// The folder used to place output files
         /// </summary>
         private static DirectoryInfo output_folder;
@@ -156,10 +152,12 @@ namespace Friends
             Console.WriteLine("==============================================");
             PrepOutputFolder();
 
-            stopwatch = new Stopwatch(); // monitor time
+            var stopwatch = new Stopwatch(); // monitor time
 
             //RunSimulationClassic();
             RunFriendSimulation();
+
+            stopwatch.Stop();
 
             TimeSpan t = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
             string elapsedTime = string.Format("{0:D2}h:{1:D2}m:{2:D2}s:{3:D3}ms",
@@ -229,7 +227,6 @@ namespace Friends
             Console.WriteLine($"{MAX_ITERATIONS}\t" +
                         $"runAvg = {runAvg}");
             Console.WriteLine("done running simulations");
-            stopwatch.Stop();
 
             Console.WriteLine("print output files:");
             // print agents to json files.
@@ -270,6 +267,7 @@ namespace Friends
             var agents = CreateFriendAgents(network);
 
             // todo print network to file
+            SaveToFile(network, "initNetwork.pdf");
 
             // save inital agents to file
             SaveToFile(agents, "init.json");
@@ -340,7 +338,6 @@ namespace Friends
             Console.WriteLine($"{MAX_ITERATIONS}\t" +
                        $"runAvg = {runAvg}");
             Console.WriteLine("done running simulations");
-            stopwatch.Stop();
 
             Console.WriteLine("print output files:");
             // print agents to json files.
@@ -348,6 +345,7 @@ namespace Friends
             SaveToFile(runner, "runner.csv");
             PlotToFile(runner, "success.png");
             // todo print network to file
+            SaveToFile(network, "initNetwork.pdf");
         }
 
         /// <summary>
@@ -485,6 +483,13 @@ namespace Friends
             var file = Path.Combine(output_folder.FullName, fileName);
 
             dtos.SaveAsJson(file);
+        }
+
+        private static void SaveToFile(Graph.Graph g, string fileName)
+        {
+            var file = Path.Combine(output_folder.FullName, fileName);
+
+            g.SaveToPdf(file);
         }
 
         private static void PrepOutputFolder()
