@@ -15,7 +15,7 @@ plot_json <- function(data){
     # print(init[[i]])
     traj <- data[[i]]$Trajectories
     
-    for (j in 1:4){
+    for (j in 1:5){
       xs <- traj[[j]]$X
       ys <- traj[[j]]$Y
       
@@ -38,4 +38,26 @@ plot_json <- function(data){
 plot_json(init)
 
 plot_json(out)
+
+# plot Friends
+init10 <- fromJSON(file = "./init10.json")
+out10 <- fromJSON(file = "./out10.json")
+plot_json(init10)
+plot_json(out10)
+
+init_T4_100 <- fromJSON(file = "./init_T4_100.json")
+out_T4_100 <- fromJSON(file = "./out_T4_100.json")
+plot_json(init_T4_100)
+plot_json(out_T4_100)
+
+init10s <- fromJSON(file = "./init10s.json")
+out10s <- fromJSON(file = "./out10s.json")
+plot_json(init10s)
+plot_json(out10s)
+
+
+init5 <- fromJSON(file = "./init5.json")
+out5 <- fromJSON(file = "./out5.json")
+plot_json(init5)
+plot_json(out5)
 

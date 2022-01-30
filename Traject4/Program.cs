@@ -50,7 +50,7 @@ namespace Traject4
         /// <summary>
         /// 
         /// </summary>
-        public readonly static int TRAJ_NUM = 4; // value paper
+        public readonly static int TRAJ_NUM = 5; // value paper
 
         /// <summary>
         /// 
